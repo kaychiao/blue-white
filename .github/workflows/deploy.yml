@@ -61,7 +61,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir -p _site
-          cp index.html daily-copy.js generated-copy.js weather.js weather-data.js _site/
+          cp index.html daily-copy.js generated-copy.js weather.js weather-data.js longing.js _site/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

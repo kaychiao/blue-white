@@ -31,6 +31,10 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 .weather-temp{font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}.weather-location,.weather-description{font-size:12px;font-weight:400}.weather-chevron{font-size:14px;transition:transform .18s}.weather-disclosure[open] .weather-chevron{transform:rotate(180deg)}
 .weather-disclosure[open]{width:min(320px,100%)}.weather-disclosure[open] .weather-summary{justify-content:flex-start;padding:0 4px}
 .weather-expanded{padding:12px 4px 4px;border-top:1px solid #c8daed}.weather-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 12px}.weather-metrics div{display:flex;flex-direction:column;gap:4px}.weather-metrics dt{font-size:11px}.weather-metrics dd{margin:0;color:#294c72;font-size:14px;font-variant-numeric:tabular-nums}.clothing-note{font-size:13px;line-height:1.7;margin:0;color:#385472}.weather-detail-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;margin-top:8px}.weather-refresh{border:0;background:transparent;color:#386b9e;min-width:44px;min-height:44px;font-size:20px;cursor:pointer;border-radius:50%}.weather-refresh:hover{background:#dfeafa}.weather-refresh:disabled{opacity:.4}.weather-foot{font-size:11px;line-height:1.6;display:flex;flex-direction:column;gap:4px}.weather-foot a{color:inherit;width:fit-content;text-underline-offset:3px}
+
+.longing{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin-top:22px;color:#466c94;--heartbeat:1.8s}.longing-heart{width:22px;height:22px;flex:none;animation:littleHeartbeat var(--heartbeat) ease-in-out infinite;transform-origin:center}.longing-reading{font-size:12px;letter-spacing:.02em}.longing-number{display:inline-block;min-width:4ch;margin-left:6px;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:#286cb6}.longing-percent{font-size:11px;margin-left:2px}.longing-note{font-size:12px;line-height:1.7;color:#4c6584}.longing-note:before{content:"·";margin-right:10px;color:#7295ba}@keyframes littleHeartbeat{0%,38%,100%{transform:scale(1);opacity:.7}12%{transform:scale(1.13);opacity:1}24%{transform:scale(1.02)}30%{transform:scale(1.07)}}
+@media(max-width:400px){.longing-note{flex-basis:100%;padding-left:32px}.longing-note:before{content:none}}
+@media(prefers-reduced-motion:reduce){.longing-heart{animation:none}}
 </style>
 </head>
 <body>
@@ -44,6 +48,11 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
     <h1 class="title" id="title">在无数条可能的轨迹里，<br>今天也想起<span>你</span>。</h1>
     <p class="poem" id="poem">不是要打断你的一天，只是想把一小段安静的蓝色，放到你路过的地方。<br>忙的时候认真忙，累的时候就停一会儿。</p>
     <p class="personal" id="personal">愿今天的地铁不太挤，<b>咖啡刚好合口。</b></p>
+    <div class="longing" id="longing" aria-label="随上海时间增长的想你指数">
+      <svg class="longing-heart" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20S3 14.5 3 8.5C3 3.8 9 2.5 12 7c3-4.5 9-3.2 9 1.5C21 14.5 12 20 12 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 12h3l2-4 3 8 2-4h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="longing-reading">想你指数 <span class="longing-number" id="longingValue">12.0</span><span class="longing-percent">%</span></span>
+      <span class="longing-note" id="longingNote">才刚开始，就已经想起你。</span>
+    </div>
     <div class="divider"></div>
     <div class="code-note"><em id="code">const littleWish = () =&gt; “今天顺顺利利”;</em><br>// 不用回复，收下这点小小的好运就好。</div>
   </article>
@@ -147,5 +156,6 @@ function restart(){cancelAnimationFrame(raf);resize();frame()}new ResizeObserver
 document.getElementById('planet').addEventListener('click',()=>{newScene();burst();restart();document.getElementById('hint').innerHTML='A new pattern, just for you <span>· tap again</span>';});
 </script><script src="./weather-data.js"></script>
 <script src="./weather.js"></script>
+<script src="./longing.js"></script>
 </body>
 </html>
