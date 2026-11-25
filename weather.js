@@ -37,6 +37,7 @@
     byId('clothing').textContent=clothes;
     const stamp=new Intl.DateTimeFormat('zh-CN',{timeZone:zone,month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(c.time*1000));
     const stale=Date.now()-c.time*1000>90*60*1000;
+    byId('weatherUpdated').textContent=`${cached||stale?'较早数据 · ':''}${stamp} 更新 · 数据说明`;
     byId('weatherStatus').textContent=`${cached||stale?'较早数据 · ':''}${stamp} 数据 · 每小时发布 · 穿衣按体感估算`;
     byId('weatherPanel').setAttribute('aria-busy','false');
   }
@@ -58,7 +59,7 @@
     } catch {
       let shown=false;
       try {const saved=JSON.parse(localStorage.getItem(cacheKey));if(saved && Date.now()-saved.savedAt<2*3600*1000){render(saved.data,true);shown=true}}catch{}
-      if(!shown){for(const id of ['temperature','feelsLike','humidity','rainChance'])byId(id).textContent='—';byId('conditions').textContent='暂时无法获取';byId('clothing').textContent='天气连接暂不可用，出门前看看当地预报。';byId('weatherStatus').textContent='天气尚未发布或数据已过期 · 稍后再试';}
+      if(!shown){byId('weatherUpdated').textContent='暂未更新 · 数据说明';for(const id of ['temperature','feelsLike','humidity','rainChance'])byId(id).textContent='—';byId('conditions').textContent='暂时无法获取';byId('clothing').textContent='天气连接暂不可用，出门前看看当地预报。';byId('weatherStatus').textContent='天气尚未发布或数据已过期 · 稍后再试';}
     } finally {busy=false;byId('weatherRefresh').disabled=false;byId('weatherPanel').setAttribute('aria-busy','false');}
   }
   byId('weatherRefresh').addEventListener('click',refresh);
