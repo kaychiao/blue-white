@@ -59,17 +59,17 @@ jobs:
         with:
           path: .cache/weather.json
           key: weather-${{ github.run_id }}-${{ github.run_attempt }}
-      - name: Prepare restaurant preview
+      - name: Configure browser restaurant search
         env:
-          AMAP_API_KEY: ${{ secrets.AMAP_API_KEY }}
-          AMAP_PUBLISH: '1'
-        run: node scripts/test-amap.mjs || echo "::warning::Restaurant preview unavailable; keeping empty fallback"
+          AMAP_JS_KEY: ${{ secrets.AMAP_JS_KEY }}
+          AMAP_JS_SECURITY_CODE: ${{ secrets.AMAP_JS_SECURITY_CODE }}
+        run: node scripts/build-amap-config.mjs
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Prepare static site
         run: |
           mkdir -p _site
-          cp index.html daily-copy.js generated-copy.js weather.js weather-data.js longing.js restaurant-data.js restaurants.js _site/
+          cp index.html daily-copy.js generated-copy.js weather.js weather-data.js longing.js amap-config.js restaurants.js _site/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

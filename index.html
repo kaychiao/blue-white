@@ -49,6 +49,9 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 
 .food-section{max-width:1060px;margin:8px auto 32px;padding:24px 0;border-top:1px solid #c8daed;color:#294c72}.food-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:44px;cursor:pointer;list-style:none}.food-summary::-webkit-details-marker{display:none}.food-title{font-size:18px;font-weight:600;letter-spacing:-.02em}.food-subtitle{font-size:12px;color:#4c6584;margin-left:12px}.food-chevron{font-size:18px;transition:transform .18s}.food-section[open] .food-chevron{transform:rotate(180deg)}.food-section[open] .food-summary{margin-bottom:16px}.food-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}.food-status{font-size:12px;line-height:1.7;margin:0;color:#4c6584}.restaurant-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.restaurant-card{padding:22px;border:1px solid #cedff0;border-radius:18px;background:#f7faff}.restaurant-tag{font-size:11px;color:#466c94}.restaurant-card h3{font-size:17px;line-height:1.5;margin:10px 0}.restaurant-stats{font-size:13px;color:#286cb6}.restaurant-reason{font-size:14px;line-height:1.75}.restaurant-address,.restaurant-hours{font-size:12px;color:#4c6584;line-height:1.7}.restaurant-card a{display:inline-flex;align-items:center;min-height:44px;font-size:13px;color:#286cb6;text-underline-offset:4px}.food-summary:focus-visible,.restaurant-card a:focus-visible{outline:2px solid #286cb6;outline-offset:4px}.food-toolbar button{min-height:44px}.food-toolbar button:disabled{opacity:.45;cursor:default}.food-notice{font-size:12px;color:#4c6584;line-height:1.7;margin:16px 0 0}
 @media(max-width:1120px){.food-section{margin-left:30px;margin-right:30px}}@media(max-width:760px){.food-section{margin:0 23px 26px;padding:16px 0}.food-subtitle{display:block;margin:5px 0 0}.restaurant-grid{grid-template-columns:1fr}.food-toolbar{align-items:flex-start}.restaurant-card{padding:18px}}
+
+.food-location-controls{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px}.food-location-form{display:flex;flex:1;gap:8px;min-width:240px}.food-location-form input{flex:1;min-width:0;min-height:44px;padding:10px 14px;border:1px solid #adc7e2;border-radius:12px;background:#f7faff;color:#294c72;font:14px -apple-system,BlinkMacSystemFont,sans-serif}.food-location-form input::placeholder{color:#526c87}.food-location-form input:focus-visible{outline:2px solid #286cb6;outline-offset:2px}.food-location-controls button{min-height:44px}.food-location-controls button:disabled{opacity:.45;cursor:wait}.food-location-options{display:grid;gap:8px;margin:14px 0}.place-option{text-align:left;padding:12px 16px;min-height:44px;border:1px solid #c8daed;border-radius:12px;background:#f7faff;color:#294c72;font:14px/1.6 -apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer}.place-option:hover{background:#e5effb}.place-option:focus-visible{outline:2px solid #286cb6;outline-offset:2px}.visually-hidden{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(max-width:480px){.food-location-form{flex-basis:100%;min-width:0}.food-location-form .shuffle{padding:10px 14px}}
 </style>
 </head>
 <body>
@@ -95,10 +98,13 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
   </div>
 </main>
 <details class="food-section" id="food">
-  <summary class="food-summary"><span><span class="food-title">Fred，今天吃什么？</span><span class="food-subtitle">川菜优先 · 上海餐厅预览</span></span><span class="food-chevron" aria-hidden="true">⌄</span></summary>
-  <div class="food-toolbar"><p class="food-status" id="restaurantStatus" role="status">正在读取餐厅列表…</p><button class="shuffle" id="restaurantShuffle" type="button">换一批 ↻</button></div>
+  <summary class="food-summary"><span><span class="food-title">Fred，今天吃什么？</span><span class="food-subtitle">川菜优先 · 找找附近的好味道</span></span><span class="food-chevron" aria-hidden="true">⌄</span></summary>
+  <div class="food-location-controls"><button class="shuffle" id="restaurantLocate" type="button">用我的位置 ↗</button><form id="restaurantForm" class="food-location-form"><label for="restaurantAddress" class="visually-hidden">输入城市、商圈、地铁站或地址</label><input id="restaurantAddress" type="search" maxlength="100" placeholder="输入城市、商圈或地铁站" autocomplete="off"><button class="shuffle" id="restaurantSearch" type="submit">查找地点</button></form></div>
+  <p class="food-notice">仅在你点击后申请浏览器定位。位置或输入地点会发送给高德，用于附近搜索，不在本站保存。</p>
+  <div class="food-location-options" id="restaurantLocations"></div>
+  <div class="food-toolbar"><p class="food-status" id="restaurantStatus" role="status">选择当前位置，或输入想去的地点。</p><button class="shuffle" id="restaurantShuffle" type="button" disabled>换一批 ↻</button></div>
   <div class="restaurant-grid" id="restaurantList"></div>
-  <p class="food-notice">目前是固定位置的展示预览，尚未接入实时定位。评分、人均和营业时间仅供参考，出发前请到地图确认。</p>
+  <p class="food-notice">评分、人均和营业时间以高德返回为准；暂无评分的店不会标为高分。出发前请到地图确认。</p>
 </details>
 <footer class="bottom"><div class="thought"><b>A LITTLE THOUGHT</b><span id="thought">宇宙不一定有答案，但总有一颗星会按时出现。</span></div><button class="shuffle" id="shuffle" type="button">换一段心情 ↗</button></footer>
 <script src="./daily-copy.js"></script>
@@ -181,7 +187,7 @@ document.getElementById('planet').addEventListener('click',()=>{newScene();burst
 </script><script src="./weather-data.js"></script>
 <script src="./weather.js"></script>
 <script src="./longing.js"></script>
-<script src="./restaurant-data.js"></script>
+<script src="./amap-config.js"></script>
 <script src="./restaurants.js"></script>
 </body>
 </html>
