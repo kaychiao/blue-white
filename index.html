@@ -35,6 +35,17 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 .longing{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin-top:22px;color:#466c94;--heartbeat:1.8s}.longing-heart{width:22px;height:22px;flex:none;animation:littleHeartbeat var(--heartbeat) ease-in-out infinite;transform-origin:center}.longing-reading{font-size:12px;letter-spacing:.02em}.longing-number{display:inline-block;min-width:4ch;margin-left:6px;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:#286cb6}.longing-percent{font-size:11px;margin-left:2px}.longing-note{font-size:12px;line-height:1.7;color:#4c6584}.longing-note:before{content:"·";margin-right:10px;color:#7295ba}@keyframes littleHeartbeat{0%,38%,100%{transform:scale(1);opacity:.7}12%{transform:scale(1.13);opacity:1}24%{transform:scale(1.02)}30%{transform:scale(1.07)}}
 @media(max-width:400px){.longing-note{flex-basis:100%;padding-left:32px}.longing-note:before{content:none}}
 @media(prefers-reduced-motion:reduce){.longing-heart{animation:none}}
+
+/* Small weather accessory: key readings stay visible at both sizes. */
+.weather-disclosure{width:min(320px,100%)}
+.weather-summary{display:grid;grid-template-columns:minmax(0,1fr) auto;justify-content:initial;gap:5px 12px;padding:10px 14px;border-radius:16px}
+.weather-summary-main{display:flex;align-items:baseline;gap:9px;min-width:0;flex-wrap:wrap}
+.weather-summary-stats{grid-column:1;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:11px;line-height:1.5;color:#4c6584}
+.weather-summary-stats b{font-weight:500;font-variant-numeric:tabular-nums;margin-left:3px;color:#385472}
+.weather-chevron{grid-column:2;grid-row:1/3;align-self:center}
+.weather-disclosure[open] .weather-summary{padding:10px 4px}
+.weather-disclosure[open] .weather-summary-stats{display:none}
+.weather-disclosure[open] .weather-chevron{grid-row:1}
 </style>
 </head>
 <body>
@@ -66,7 +77,11 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
     <div class="scene-hint" id="hint">Tap the planet to reveal a new <span>mathematical pattern</span></div>
   </section>
 <details class="weather-panel weather-disclosure" id="weatherPanel" aria-label="上海市天气" aria-busy="true">
-  <summary class="weather-summary"><span class="weather-location">上海</span><span class="weather-temp" id="temperature">—</span><span class="weather-description" id="conditions">天气加载中</span><span class="weather-chevron" aria-hidden="true">⌄</span></summary>
+  <summary class="weather-summary">
+    <span class="weather-summary-main"><span class="weather-location">上海</span><span class="weather-temp" id="temperature">—</span><span class="weather-description" id="conditions">天气加载中</span></span>
+    <span class="weather-summary-stats"><span>湿度 <b id="humidityCompact">—</b></span><span title="未来 3 小时最高降水概率">3h 降水 <b id="rainCompact">—</b></span></span>
+    <span class="weather-chevron" aria-hidden="true">⌄</span>
+  </summary>
   <div class="weather-expanded">
     <dl class="weather-metrics"><div><dt>体感</dt><dd id="feelsLike">—</dd></div><div><dt title="未来 3 小时最高降水概率">3h 降水</dt><dd id="rainChance">—</dd></div><div><dt>湿度</dt><dd id="humidity">—</dd></div></dl>
     <p class="clothing-note" id="clothing">等天气更新，给你一点出门穿衣参考。</p>

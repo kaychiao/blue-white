@@ -30,6 +30,7 @@
     const rain=windowValues.length?Math.max(...windowValues.map(x=>x.p)):null;
     byId('temperature').textContent=degrees(c.temperature_2m);byId('conditions').textContent=description(c.weather_code);
     byId('feelsLike').textContent=degrees(c.apparent_temperature);byId('humidity').textContent=percent(c.relative_humidity_2m);byId('rainChance').textContent=percent(rain);
+    byId('humidityCompact').textContent=percent(c.relative_humidity_2m);byId('rainCompact').textContent=percent(rain);
     const feels=Number.isFinite(c.apparent_temperature)?c.apparent_temperature:c.temperature_2m;
     let clothes=feels<5?'厚外套或羽绒服，围巾也带上。':feels<12?'毛衣加厚外套，怕冷可以加条围巾。':feels<18?'长袖配外套，早晚别穿太薄。':feels<25?'薄长袖或轻外套，方便随时增减。':'轻薄透气的衣服，出门注意防晒。';
     if(c.wind_speed_10m>=20)clothes+=' 风比较大，外层选挡风一点的。';
@@ -59,7 +60,7 @@
     } catch {
       let shown=false;
       try {const saved=JSON.parse(localStorage.getItem(cacheKey));if(saved && Date.now()-saved.savedAt<2*3600*1000){render(saved.data,true);shown=true}}catch{}
-      if(!shown){byId('weatherUpdated').textContent='暂未更新 · 数据说明';for(const id of ['temperature','feelsLike','humidity','rainChance'])byId(id).textContent='—';byId('conditions').textContent='暂时无法获取';byId('clothing').textContent='天气连接暂不可用，出门前看看当地预报。';byId('weatherStatus').textContent='天气尚未发布或数据已过期 · 稍后再试';}
+      if(!shown){byId('weatherUpdated').textContent='暂未更新 · 数据说明';for(const id of ['temperature','feelsLike','humidity','rainChance','humidityCompact','rainCompact'])byId(id).textContent='—';byId('conditions').textContent='暂时无法获取';byId('clothing').textContent='天气连接暂不可用，出门前看看当地预报。';byId('weatherStatus').textContent='天气尚未发布或数据已过期 · 稍后再试';}
     } finally {busy=false;byId('weatherRefresh').disabled=false;byId('weatherPanel').setAttribute('aria-busy','false');}
   }
   byId('weatherRefresh').addEventListener('click',refresh);
