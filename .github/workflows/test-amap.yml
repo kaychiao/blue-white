@@ -1,0 +1,23 @@
+name: Test AMap restaurant search
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/test-amap.mjs
+      - .github/workflows/test-amap.yml
+permissions:
+  contents: read
+jobs:
+  test-amap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test Shanghai nearby restaurants
+        env:
+          AMAP_API_KEY: ${{ secrets.AMAP_API_KEY }}
+        run: node scripts/test-amap.mjs
