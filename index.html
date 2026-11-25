@@ -133,6 +133,7 @@ if(burstPower>.03){for(let i=0;i<38;i++){const a=i*Math.PI*2/38+scene.seed,r=(1.
 if(!reduce.matches){phase+=.012;burstPower*=.955;raf=requestAnimationFrame(frame)}}
 function restart(){cancelAnimationFrame(raf);resize();frame()}new ResizeObserver(restart).observe(canvas);restart();
 document.getElementById('planet').addEventListener('click',()=>{newScene();burst();restart();document.getElementById('hint').innerHTML='A new pattern, just for you <span>· tap again</span>';});
-</script><script src="./weather.js"></script>
+</script><script src="./weather-data.js"></script>
+<script src="./weather.js"></script>
 </body>
 </html>

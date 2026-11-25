@@ -5,6 +5,7 @@ on:
     branches: ["main"]
   schedule:
     - cron: "17 23 * * *" # 北京时间约 07:17，GitHub 定时任务可能延迟
+    - cron: "37 * * * *" # 每小时更新天气，不调用 Gemini
   workflow_dispatch:
 
 permissions:
@@ -32,7 +33,7 @@ jobs:
           restore-keys: ai-copy-
       - name: Generate daily Gemini copy
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ github.event.schedule != '37 * * * *' && secrets.GEMINI_API_KEY || '' }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
           FRED_PROFILE: ${{ secrets.FRED_PROFILE }}
           FRED_RECENT: ${{ secrets.FRED_RECENT }}
@@ -42,12 +43,25 @@ jobs:
         with:
           path: .cache/generated-copy.json
           key: ai-copy-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Restore recent weather snapshot
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache/weather.json
+          key: weather-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: weather-
+      - name: Fetch Shanghai weather
+        run: node scripts/fetch-weather.mjs
+      - name: Save weather snapshot
+        uses: actions/cache/save@v4
+        with:
+          path: .cache/weather.json
+          key: weather-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Prepare static site
         run: |
           mkdir -p _site
-          cp index.html daily-copy.js generated-copy.js weather.js _site/
+          cp index.html daily-copy.js generated-copy.js weather.js weather-data.js _site/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

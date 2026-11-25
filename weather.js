@@ -12,7 +12,6 @@
     setTimeout(tick,1000-now.getMilliseconds());
   }
   tick();
-  const url='https://api.open-meteo.com/v1/forecast?latitude=31.2304&longitude=121.4737&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&hourly=precipitation_probability&forecast_days=2&timezone=Asia%2FShanghai&timeformat=unixtime';
   const cacheKey='bw-shanghai-weather-v1';let busy=false;
   const byId=id=>document.getElementById(id);
   const percent=n=>Number.isFinite(n)?`${Math.round(n)}%`:'—';
@@ -25,7 +24,7 @@
     if([61,63,65,66,67,80,81,82].includes(code))return '有雨';return '天气更新中';
   }
   function render(data,cached=false) {
-    const c=data.current;if(!c || !Number.isFinite(c.temperature_2m) || !Number.isFinite(c.time))throw Error('Invalid weather');
+    const c=data?.current;if(!c || !Number.isFinite(c.temperature_2m) || !Number.isFinite(c.time) || Date.now()-c.time*1000>3*3600000 || c.time*1000>Date.now()+900000)throw Error('Invalid or expired weather');
     const now=Date.now()/1000, times=data.hourly?.time||[], probs=data.hourly?.precipitation_probability||[];
     const windowValues=times.map((t,i)=>({t,p:probs[i]})).filter(x=>x.t>=Math.floor(now/3600)*3600 && x.t<now+3*3600 && Number.isFinite(x.p));
     const rain=windowValues.length?Math.max(...windowValues.map(x=>x.p)):null;
@@ -36,24 +35,34 @@
     if(c.wind_speed_10m>=20)clothes+=' 风比较大，外层选挡风一点的。';
     if(rain>=40 || [51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99].includes(c.weather_code))clothes+=' 出门带把伞。';
     byId('clothing').textContent=clothes;
-    const stamp=new Intl.DateTimeFormat('zh-CN',{timeZone:zone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(c.time*1000));
+    const stamp=new Intl.DateTimeFormat('zh-CN',{timeZone:zone,month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(c.time*1000));
     const stale=Date.now()-c.time*1000>90*60*1000;
-    byId('weatherStatus').textContent=`${cached||stale?'缓存数据 · ':''}${stamp} 天气数据 · 穿衣建议按体感估算`;
+    byId('weatherStatus').textContent=`${cached||stale?'较早数据 · ':''}${stamp} 数据 · 每小时发布 · 穿衣按体感估算`;
     byId('weatherPanel').setAttribute('aria-busy','false');
+  }
+  function loadSnapshot() {
+    return new Promise((resolve,reject)=>{
+      const script=document.createElement('script');let finished=false;
+      script.src='./weather-data.js'+(location.protocol==='file:'?'':`?v=${Date.now()}`);
+      const timer=setTimeout(()=>done(new Error('Snapshot timeout')),10000);
+      function done(error){if(finished)return;finished=true;clearTimeout(timer);script.remove();error?reject(error):resolve(window.shanghaiWeather)}
+      script.onload=()=>done();script.onerror=()=>done(new Error('Snapshot unavailable'));
+      document.head.append(script);
+    });
   }
   async function refresh() {
     if(busy)return;busy=true;byId('weatherRefresh').disabled=true;
     try {
-      const response=await fetch(url,{signal:AbortSignal.timeout(12000)});
-      if(!response.ok)throw Error('Weather request failed');const data=await response.json();render(data);
+      const data=await loadSnapshot();render(data);
       try{localStorage.setItem(cacheKey,JSON.stringify({savedAt:Date.now(),data}))}catch{}
     } catch {
       let shown=false;
       try {const saved=JSON.parse(localStorage.getItem(cacheKey));if(saved && Date.now()-saved.savedAt<2*3600*1000){render(saved.data,true);shown=true}}catch{}
-      if(!shown){for(const id of ['temperature','feelsLike','humidity','rainChance'])byId(id).textContent='—';byId('conditions').textContent='暂时无法获取';byId('clothing').textContent='天气连接暂不可用，出门前看看当地预报。';byId('weatherStatus').textContent='未获取到新数据 · 可以点右上角重试';}
+      if(!shown){for(const id of ['temperature','feelsLike','humidity','rainChance'])byId(id).textContent='—';byId('conditions').textContent='暂时无法获取';byId('clothing').textContent='天气连接暂不可用，出门前看看当地预报。';byId('weatherStatus').textContent='天气尚未发布或数据已过期 · 稍后再试';}
     } finally {busy=false;byId('weatherRefresh').disabled=false;byId('weatherPanel').setAttribute('aria-busy','false');}
   }
   byId('weatherRefresh').addEventListener('click',refresh);
+  try{render(window.shanghaiWeather)}catch{}
   refresh();setInterval(()=>{if(!document.hidden)refresh()},15*60*1000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
 })();
