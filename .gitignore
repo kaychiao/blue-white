@@ -1,0 +1,6 @@
+.cache/
+.env
+.env.*
+_site/
+content/profile.json
+content/recent.json

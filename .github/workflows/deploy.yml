@@ -3,6 +3,8 @@ name: Deploy Static Site to GitHub Pages
 on:
   push:
     branches: ["main"]
+  schedule:
+    - cron: "17 23 * * *" # 北京时间约 07:17，GitHub 定时任务可能延迟
   workflow_dispatch:
 
 permissions:
@@ -18,12 +20,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore last valid AI batch
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache/generated-copy.json
+          key: ai-copy-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: ai-copy-
+      - name: Generate daily Gemini copy
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          FRED_PROFILE: ${{ secrets.FRED_PROFILE }}
+          FRED_RECENT: ${{ secrets.FRED_RECENT }}
+        run: node scripts/generate-copy.mjs
+      - name: Save AI batch
+        uses: actions/cache/save@v4
+        with:
+          path: .cache/generated-copy.json
+          key: ai-copy-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Prepare static site
         run: |
           mkdir -p _site
-          cp index.html daily-copy.js _site/
+          cp index.html daily-copy.js generated-copy.js _site/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

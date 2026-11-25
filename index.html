@@ -40,10 +40,27 @@ main{min-height:calc(100svh - 62px);max-width:1120px;margin:auto;padding:28px 30
 </main>
 <footer class="bottom"><div class="thought"><b>A LITTLE THOUGHT</b><span id="thought">宇宙不一定有答案，但总有一颗星会按时出现。</span></div><button class="shuffle" id="shuffle" type="button">换一段心情 ↗</button></footer>
 <script src="./daily-copy.js"></script>
+<script src="./generated-copy.js"></script>
 <script>
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const key='bw-combo-v5';let last=localStorage.getItem(key)||'';
-function makeCopy(){let row,pair,personal,code,thought,signature;do{row=pick(dailyCopy.titleLines);pair=pick(dailyCopy.bodyPairs);personal=pick(dailyCopy.personal);code=pick(dailyCopy.codeBits);thought=pick(dailyCopy.thoughts);signature=[row.join('|'),pair.join(''),personal,code,thought].join('¦')}while(signature===last);last=signature;localStorage.setItem(key,last);const [a,b,c]=row;document.getElementById('title').innerHTML=`<span class="title-line">${a}</span><span class="title-line">${b}<span class="accent">${c}</span>。</span>`;document.getElementById('title').classList.toggle('compact',Math.max(a.length,b.length+c.length)>10);requestAnimationFrame(fitTitle);document.getElementById('poem').textContent=pair.join('');document.getElementById('personal').textContent=personal;document.getElementById('code').textContent=code;document.getElementById('thought').textContent=thought;}
+function makeCopy(){
+ const dateKey=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ const batch=window.aiCopy;
+ if(batch?.validUntil>=dateKey && batch.notes?.length){
+   let history=[];try{history=JSON.parse(localStorage.getItem('bw-ai-history')||'[]')}catch{}
+   const candidates=batch.notes.filter(n=>!history.includes(n.first+n.second+n.accent));
+   const note=pick(candidates.length?candidates:batch.notes);
+   const signature=note.first+note.second+note.accent;
+   try{localStorage.setItem('bw-ai-history',JSON.stringify([...history,signature].slice(-6)))}catch{}
+   const title=document.getElementById('title');title.replaceChildren();
+   const first=document.createElement('span'),second=document.createElement('span'),accent=document.createElement('span');
+   first.className=second.className='title-line';accent.className='accent';first.textContent=note.first;second.textContent=note.second;accent.textContent=note.accent;second.append(accent);title.append(first,second);
+   title.classList.toggle('compact',Math.max(note.first.length,note.second.length+note.accent.length)>10);
+   for(const [id,field] of [['poem','body'],['personal','personal'],['code','code'],['thought','thought']])document.getElementById(id).textContent=note[field];
+   requestAnimationFrame(fitTitle);return;
+ }
+ let row,pair,personal,code,thought,signature;do{row=pick(dailyCopy.titleLines);pair=pick(dailyCopy.bodyPairs);personal=pick(dailyCopy.personal);code=pick(dailyCopy.codeBits);thought=pick(dailyCopy.thoughts);signature=[row.join('|'),pair.join(''),personal,code,thought].join('¦')}while(signature===last);last=signature;localStorage.setItem(key,last);const [a,b,c]=row;document.getElementById('title').innerHTML=`<span class="title-line">${a}</span><span class="title-line">${b}<span class="accent">${c}</span>。</span>`;document.getElementById('title').classList.toggle('compact',Math.max(a.length,b.length+c.length)>10);requestAnimationFrame(fitTitle);document.getElementById('poem').textContent=pair.join('');document.getElementById('personal').textContent=personal;document.getElementById('code').textContent=code;document.getElementById('thought').textContent=thought;}
 function fitTitle(){
  const title=document.getElementById('title');
  title.style.fontSize='';
