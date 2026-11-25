@@ -50,6 +50,9 @@ jobs:
           key: weather-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: weather-
       - name: Fetch Shanghai weather
+        env:
+          QWEATHER_API_KEY: ${{ secrets.QWEATHER_API_KEY }}
+          QWEATHER_API_HOST: ${{ secrets.QWEATHER_API_HOST }}
         run: node scripts/fetch-weather.mjs
       - name: Save weather snapshot
         uses: actions/cache/save@v4
