@@ -1,623 +1,103 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blue & White — Daily Edition</title>
-    <style>
-        :root {
-            --bg-canvas: #fbfbfd;
-            --card-surface: rgba(255, 255, 255, 0.85);
-            --text-primary: #1d1d1f;
-            --text-secondary: #86868b;
-            --apple-blue: #0071e3;
-            --apple-blue-hover: #0077ed;
-            --ice-tint: #eef6ff;
-            --border-hairline: rgba(0, 0, 0, 0.06);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        body {
-            min-height: 100vh;
-            background-color: var(--bg-canvas);
-            color: var(--text-primary);
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 32px 20px;
-            overflow-x: hidden;
-            user-select: none;
-        }
-
-        .top-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 52px;
-            background: rgba(251, 251, 253, 0.8);
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid var(--border-hairline);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 max(24px, 8vw);
-            z-index: 100;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .top-bar .brand {
-            font-weight: 600;
-            color: var(--text-primary);
-            letter-spacing: -0.2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #liveClock {
-            font-variant-numeric: tabular-nums;
-            font-weight: 500;
-        }
-
-        .status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--apple-blue);
-            box-shadow: 0 0 8px rgba(0, 113, 227, 0.45);
-        }
-
-        .bento-wrapper {
-            width: 100%;
-            max-width: 820px;
-            margin-top: 40px;
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 18px;
-            perspective: 1200px;
-        }
-
-        .bento-card {
-            background: var(--card-surface);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.95);
-            border-radius: 28px;
-            padding: 32px;
-            box-shadow: 
-                0 4px 24px -4px rgba(0, 0, 0, 0.04),
-                0 1px 2px rgba(0, 0, 0, 0.02);
-            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .bento-card:hover {
-            box-shadow: 
-                0 20px 40px -12px rgba(0, 113, 227, 0.08),
-                0 4px 12px rgba(0, 0, 0, 0.03);
-        }
-
-        .hero-card {
-            grid-column: span 7;
-            min-height: 350px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background: linear-gradient(145deg, #ffffff 0%, #f2f8ff 100%);
-        }
-
-        .eyebrow {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--apple-blue);
-            letter-spacing: 0.6px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .hero-title {
-            font-size: 32px;
-            font-weight: 700;
-            line-height: 1.22;
-            letter-spacing: -0.8px;
-            color: var(--text-primary);
-        }
-
-        .hero-title span {
-            background: linear-gradient(135deg, #0071e3 0%, #4facfe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-desc {
-            font-size: 15px;
-            line-height: 1.65;
-            color: var(--text-secondary);
-            margin-top: 14px;
-            max-width: 94%;
-        }
-
-        .hero-footer {
-            font-size: 13px;
-            color: #0071e3;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .orb-card {
-            grid-column: span 5;
-            min-height: 350px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: #ffffff;
-            cursor: pointer;
-        }
-
-        #fluidOrb {
-            width: 225px;
-            height: 225px;
-            border-radius: 50%;
-        }
-
-        .orb-caption {
-            position: absolute;
-            bottom: 22px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            letter-spacing: 0.3px;
-        }
-
-        .detail-card {
-            grid-column: span 4;
-            padding: 26px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 160px;
-        }
-
-        .detail-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            background: var(--ice-tint);
-            color: var(--apple-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .detail-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 6px;
-            letter-spacing: -0.2px;
-        }
-
-        .detail-text {
-            font-size: 13.5px;
-            line-height: 1.55;
-            color: var(--text-secondary);
-        }
-
-        .action-card {
-            grid-column: span 12;
-            padding: 26px 34px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            background: linear-gradient(90deg, #ffffff 0%, #f4f9ff 100%);
-        }
-
-        .action-text h3 {
-            font-size: 17px;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-            margin-bottom: 4px;
-        }
-
-        .action-text p {
-            font-size: 13.5px;
-            color: var(--text-secondary);
-        }
-
-        .apple-btn {
-            background: var(--apple-blue);
-            color: #ffffff;
-            border: none;
-            padding: 11px 24px;
-            border-radius: 999px;
-            font-size: 13.5px;
-            font-weight: 500;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-            box-shadow: 0 4px 14px rgba(0, 113, 227, 0.25);
-        }
-
-        .apple-btn:hover {
-            background: var(--apple-blue-hover);
-            transform: scale(1.02);
-        }
-
-        .apple-btn:active {
-            transform: scale(0.97);
-        }
-
-        .apple-btn.done {
-            background: #1d1d1f;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
-        }
-
-        .reveal {
-            opacity: 0;
-            transform: translateY(16px) scale(0.985);
-            animation: appleReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .delay-1 { animation-delay: 0.08s; }
-        .delay-2 { animation-delay: 0.16s; }
-        .delay-3 { animation-delay: 0.24s; }
-        .delay-4 { animation-delay: 0.32s; }
-        .delay-5 { animation-delay: 0.40s; }
-
-        @keyframes appleReveal {
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        @media (max-width: 720px) {
-            .hero-card, .orb-card, .detail-card, .action-card {
-                grid-column: span 12;
-            }
-            .action-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .hero-title { font-size: 27px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#eef5ff">
+<title>Blue &amp; White — for Fred</title>
+<style>
+:root{color-scheme:light;--paper:#eef5ff;--ink:#102747;--muted:#4c6584;--blue:#286cb6;--line:rgba(58,104,159,.2)}
+*{box-sizing:border-box}html{min-height:100%;background:var(--paper)}
+body{margin:0;min-height:100svh;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif;background:radial-gradient(ellipse at 76% 26%,rgba(255,255,255,.95),transparent 33%),radial-gradient(ellipse at 20% 80%,rgba(194,221,251,.7),transparent 38%),linear-gradient(135deg,#f7faff,#e8f2ff 58%,#f7fbff);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.34;background-image:radial-gradient(#82a9d5 0.65px,transparent .65px);background-size:26px 26px;mask-image:linear-gradient(90deg,transparent,#000 30%,#000 80%,transparent)}
+.top{height:62px;max-width:1120px;margin:auto;padding:0 30px;display:flex;align-items:center;justify-content:space-between;color:#536d8b;font-size:13px;letter-spacing:.04em}.brand{display:flex;align-items:center;gap:10px;color:#284e78;font-weight:650}.brand i{display:block;width:8px;height:8px;border-radius:50%;background:#5b9cde;box-shadow:0 0 14px #78b5f1}.date{font-variant-numeric:tabular-nums}
+main{min-height:calc(100svh - 62px);max-width:1120px;margin:auto;padding:28px 30px 52px;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:24px}.letter{padding:clamp(22px,4vw,54px) 0 36px 3vw;position:relative;z-index:1}.kicker{display:flex;align-items:center;gap:12px;color:#3c74ad;font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase}.kicker:after{content:"";height:1px;width:62px;background:#8cb4dc}.hello{margin:22px 0 8px;color:#5c7592;font-size:15px;letter-spacing:.02em}.title{font-size:clamp(30px,5.2vw,60px);line-height:1.22;letter-spacing:-.055em;font-weight:570;margin:0;max-width:600px}.title .accent{color:#3879bd}.title-line{display:block;white-space:nowrap}.title.compact{font-size:clamp(29px,4.2vw,48px);max-width:600px}.poem{min-height:5.3em;max-width:35em}.personal{max-width:34em;line-height:1.75}.letter{align-self:center}.letter{min-width:0}.scene{min-width:0}.poem{margin:26px 0 0;max-width:485px;color:#385472;font-size:17px;line-height:1.95}.personal{margin-top:26px;color:#55718f;font-size:14px;letter-spacing:.02em}.personal b{color:#285b91;font-weight:600}.divider{width:38px;height:1px;background:#83a9d1;margin:30px 0 20px}.code-note{color:#507092;font:13px/1.8 ui-monospace,SFMono-Regular,Menlo,monospace}.code-note em{font-style:normal;color:#286cb6}.scene{position:relative;height:min(620px,74vh);min-height:430px;display:grid;place-items:center}.scene:before,.scene:after{content:"";position:absolute;width:min(40vw,460px);aspect-ratio:1;border:1px solid rgba(74,127,185,.13);border-radius:50%;transform:rotate(-24deg) scaleY(.42)}.scene:after{width:min(33vw,370px);transform:rotate(34deg) scaleY(.43);border-color:rgba(74,127,185,.11)}#cosmos{position:absolute;inset:0;width:100%;height:100%}.planet{z-index:1;position:absolute;width:210px;aspect-ratio:1;border:0;background:transparent;cursor:pointer;border-radius:50%;filter:drop-shadow(0 20px 36px rgba(62,122,190,.2));transition:transform .35s ease}.planet:hover{transform:scale(1.045)}.planet:active{transform:scale(.97)}.planet:focus-visible{outline:2px solid #286cb6;outline-offset:12px}.planet svg{width:100%;height:100%;overflow:visible}.orbit-label{position:absolute;right:5%;top:18%;color:#6786a7;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;transform:rotate(8deg)}.orbit-label:before{content:"✦";color:#5d9ddd;margin-right:8px}.scene-hint{position:absolute;bottom:5%;left:50%;transform:translateX(-50%);white-space:nowrap;color:#5c7592;font-size:13px;pointer-events:none}.scene-hint span{color:#286cb6}.bottom{max-width:1120px;margin:-10px auto 0;padding:0 30px 28px;display:flex;justify-content:space-between;align-items:center;color:#68819d;font-size:12px}.thought{display:flex;gap:12px;align-items:center}.thought b{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:#52779d;font-weight:500}.thought span{font-size:13px;color:#46617f}.shuffle{border:1px solid rgba(66,116,169,.25);color:#315f91;background:rgba(255,255,255,.48);border-radius:999px;padding:10px 17px;font:600 13px -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;cursor:pointer;transition:background .2s,transform .2s}.shuffle:hover{background:#fff;transform:translateY(-1px)}.shuffle:focus-visible{outline:3px solid #286cb6;outline-offset:3px}
+.spark{animation:twinkle 3.8s ease-in-out infinite alternate;transform-origin:center}.spark:nth-child(2n){animation-delay:-1.6s}@keyframes twinkle{from{opacity:.32;transform:scale(.72)}to{opacity:1;transform:scale(1.18)}}
+@media(max-width:760px){.top{height:54px;padding:0 20px}main{min-height:auto;padding:22px 23px 18px;grid-template-columns:1fr;gap:0}.letter{padding:28px 0 0}.title{font-size:clamp(30px,8.5vw,46px)}.title.compact{font-size:clamp(28px,7.2vw,39px)}.poem{font-size:16px;margin-top:19px}.scene{height:360px;min-height:330px;order:2}.planet{width:172px}.scene:before{width:82vw}.scene:after{width:67vw}.orbit-label{right:4%;top:12%}.scene-hint{bottom:2%}.bottom{padding:4px 23px 25px;gap:16px;align-items:flex-start}.thought{align-items:flex-start;flex-direction:column;gap:5px}.thought span{max-width:230px;line-height:1.6}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
+</style>
 </head>
 <body>
-
-    <nav class="top-bar">
-        <div class="brand">
-            <span class="status-dot"></span>
-            <span id="brandTitle">Daily Brief</span>
-        </div>
-        <div id="liveClock">Loading...</div>
-    </nav>
-
-    <main class="bento-wrapper">
-        <section class="bento-card hero-card tilt-card reveal">
-            <div>
-                <div class="eyebrow" id="heroEyebrow">Workday Edition</div>
-                <h1 class="hero-title" id="heroTitle"></h1>
-                <p class="hero-desc" id="heroDesc"></p>
-            </div>
-            <div class="hero-footer">
-                <span id="heroFooter">Blue &amp; White · 保持从容，稳步推进</span>
-            </div>
-        </section>
-
-        <section class="bento-card orb-card tilt-card reveal delay-1" id="orbCard">
-            <canvas id="fluidOrb"></canvas>
-            <div class="orb-caption" id="orbCaption">轻触光球 · 切换深呼吸频率</div>
-        </section>
-
-        <section class="bento-card detail-card tilt-card reveal delay-2">
-            <div class="detail-icon">01</div>
-            <div>
-                <div class="detail-title" id="card1Title"></div>
-                <p class="detail-text" id="card1Text"></p>
-            </div>
-        </section>
-
-        <section class="bento-card detail-card tilt-card reveal delay-3">
-            <div class="detail-icon">02</div>
-            <div>
-                <div class="detail-title" id="card2Title"></div>
-                <p class="detail-text" id="card2Text"></p>
-            </div>
-        </section>
-
-        <section class="bento-card detail-card tilt-card reveal delay-4">
-            <div class="detail-icon">03</div>
-            <div>
-                <div class="detail-title" id="card3Title"></div>
-                <p class="detail-text" id="card3Text"></p>
-            </div>
-        </section>
-
-        <section class="bento-card action-card reveal delay-5">
-            <div class="action-text">
-                <h3 id="finalTitle"></h3>
-                <p id="finalSub"></p>
-            </div>
-            <button class="apple-btn" id="ctaBtn"></button>
-        </section>
-    </main>
-
-    <script>
-        let isHeartMode = false;
-        let lastContentKey = "";
-
-        function startRealtimeClock() {
-            const clockEl = document.getElementById('liveClock');
-            const weekShortEN = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-            const pad = n => String(n).padStart(2, '0');
-
-            function tick() {
-                const now = new Date();
-                const day = weekShortEN[now.getDay()];
-                const month = now.getMonth() + 1;
-                const date = pad(now.getDate());
-                const h = pad(now.getHours());
-                const m = pad(now.getMinutes());
-                const s = pad(now.getSeconds());
-
-                clockEl.innerText = `${day} · ${month}/${date}  ${h}:${m}:${s}`;
-
-                const currentKey = `${month}-${date}-${now.getDay()}-${now.getHours()}`;
-                if (currentKey !== lastContentKey) {
-                    lastContentKey = currentKey;
-                    applyTimeContext(now);
-                }
-
-                const delay = 1000 - now.getMilliseconds();
-                setTimeout(tick, delay);
-            }
-
-            tick();
-        }
-
-        function applyTimeContext(now = new Date()) {
-            const month = now.getMonth() + 1;
-            const date = now.getDate();
-            const day = now.getDay();
-            const hour = now.getHours();
-
-            const params = new URLSearchParams(window.location.search);
-            const isChristmas = (month === 12 && date === 25) || params.get('mode') === 'xmas';
-
-            const weekNamesEN = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const weekNamesCN = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-
-            document.getElementById('brandTitle').innerText = isChristmas 
-                ? "Christmas Edition · Dec 25" 
-                : `Daily Brief · ${weekNamesEN[day]}`;
-
-            let timeGreeting = "今天也请保持好心情";
-            if (hour >= 5 && hour < 12) timeGreeting = "早安，开启清爽的一天";
-            else if (hour >= 12 && hour < 14) timeGreeting = "午休间隙，记得好好吃顿午饭";
-            else if (hour >= 14 && hour < 18) timeGreeting = "下午茶时间，忙里偷闲放空十秒";
-            else if (hour >= 18 && hour < 22) timeGreeting = "傍晚已至，把工作的喧闹关在门外";
-            else timeGreeting = "夜深了，早点休息别太熬夜";
-
-            if (isChristmas) {
-                isHeartMode = true;
-                document.getElementById('heroEyebrow').innerText = "Winter Special · Dec 25";
-                document.getElementById('heroTitle').innerHTML = `在今年的圣诞夜，<br>遇见<span>刚刚好</span>的你。`;
-                document.getElementById('heroDesc').innerText = `听说冬天的仪式感总让人格外温柔。不擅长太浮夸的表达，所以用我最熟悉的方式，把这一阵子对你的心动留在了这个蓝白页面里。`;
-                document.getElementById('heroFooter').innerText = `Merry Christmas · 干净、克制、且让人安心`;
-
-                document.getElementById('card1Title').innerText = "安静且情绪稳定";
-                document.getElementById('card1Text').innerText = "跟你聊天总有一种很舒服的松弛感，不用刻意找话题，待在一起就很安心。";
-                document.getElementById('card2Title').innerText = "极简的蓝白审美";
-                document.getElementById('card2Text').innerText = "就像你喜欢的白色和蓝色一样，简单、通透，却格外耐看。";
-                document.getElementById('card3Title').innerText = "反差感的川菜偏好";
-                document.getElementById('card3Text').innerText = "平时对零食没什么兴趣，唯独对热辣的川菜情有独钟，这点实在很可爱。";
-
-                document.getElementById('finalTitle').innerText = "圣诞快乐，我很喜欢你。";
-                document.getElementById('finalSub').innerText = "没有任何压力，只是想把这份心意坦诚地告诉你。今晚（或这周末）一起去吃顿川菜吗？";
-                document.getElementById('ctaBtn').innerText = "好呀，一起去";
-                document.getElementById('orbCaption').innerText = "圣诞特别频率 · 轻触光球互动";
-                return;
-            }
-
-            if (day === 0 || day === 6) {
-                document.getElementById('heroEyebrow').innerText = "Weekend Mode";
-                document.getElementById('heroTitle').innerHTML = `${weekNamesCN[day]}的阳光很好，<br>适合把时间留给<span>自己</span>。`;
-                document.getElementById('heroDesc').innerText = `工作日的方案和数据都可以先暂停一下。顺手写了个安静的蓝白小页面，祝你度过一个彻底松弛的${weekNamesCN[day]}。`;
-                document.getElementById('heroFooter').innerText = `Blue & White · ${timeGreeting}`;
-
-                document.getElementById('card1Title').innerText = "消息免打扰";
-                document.getElementById('card1Text').innerText = "周末就该把节奏调慢，不用急着回复消息，睡到自然醒才是正经事。";
-                document.getElementById('card2Title').innerText = "日常能量补给";
-                document.getElementById('card2Text').innerText = "对零食没什么执念也没关系，下午泡杯喜欢的茶或咖啡，晒晒太阳就很惬意。";
-                document.getElementById('card3Title').innerText = "周末美食清单";
-                document.getElementById('card3Text').innerText = "难得休息，最适合找一家地道川菜馆，用热气腾腾的烟火气犒劳一下自己。";
-
-                document.getElementById('finalTitle').innerText = `祝你${weekNamesCN[day]}愉快，彻底放松。`;
-                document.getElementById('finalSub').innerText = `如果周末刚好没安排，随时喊我一起去探店吃川菜？`;
-                document.getElementById('ctaBtn').innerText = "已签收 · 周末愉快";
-                return;
-            }
-
-            const dayFocus = {
-                1: {
-                    title: `新的一周开始了，<br>用一抹<span>蓝白</span>平稳起飞。`,
-                    desc: `周一的待办列表总是格外长，别给自己太大压力，按部就班慢慢来就好。`,
-                    c3Title: "周一充能指南",
-                    c3Text: "如果第一天工作太消耗精力，晚上最适合用一顿热辣的川菜迅速回血。",
-                    fTitle: `周一加油，祝本周一切顺利。`,
-                    fSub: `这周哪天忙完了，随时约一顿正宗川菜充充电？`
-                },
-                5: {
-                    title: `终于到了周五，<br>准备迎接<span>松弛</span>的周末。`,
-                    desc: `做内容和营销的忙了一整周，今天收好尾，就可以名正言顺地把工作留在公司了。`,
-                    c3Title: "周五晚间计划",
-                    c3Text: "周五的晚上最有仪式感，最适合约一顿热气腾腾的川菜开启周末。",
-                    fTitle: `周五快乐，距离下班又近了一步。`,
-                    fSub: `今晚或者周末有空的话，要不要一起去吃顿川菜？`
-                }
-            };
-
-            const currentDayCopy = dayFocus[day] || {
-                title: `${weekNamesCN[day]}的节奏很快，<br>记得留一点<span>蓝白</span>的空白。`,
-                desc: `做内容和营销的日常总是被各种数据和方案填满。顺手写了个干净的小页面，忙完手头的事，不妨看一眼呼吸光球放空十秒。`,
-                c3Title: "下班后的小期待",
-                c3Text: "如果今天工作太消耗精力，晚上最适合用一顿热气腾腾的川菜收尾。",
-                fTitle: `${weekNamesCN[day]}加油，祝今天一切顺利。`,
-                fSub: `这周哪天忙完了，随时约一顿正宗川菜充充电？`
-            };
-
-            document.getElementById('heroEyebrow').innerText = "Workday Edition";
-            document.getElementById('heroTitle').innerHTML = currentDayCopy.title;
-            document.getElementById('heroDesc').innerText = currentDayCopy.desc;
-            document.getElementById('heroFooter').innerText = `Blue & White · ${timeGreeting}`;
-
-            document.getElementById('card1Title').innerText = "今日能量补给";
-            document.getElementById('card1Text').innerText = "不爱吃零食也没关系，记得多喝温水，工作间隙离开屏幕远眺一分钟。";
-            document.getElementById('card2Title').innerText = "降噪模式开启";
-            document.getElementById('card2Text').innerText = "把纷繁的节奏留在屏幕里，保持你一贯的安静与松弛就好。";
-            document.getElementById('card3Title').innerText = currentDayCopy.c3Title;
-            document.getElementById('card3Text').innerText = currentDayCopy.c3Text;
-
-            document.getElementById('finalTitle').innerText = currentDayCopy.fTitle;
-            document.getElementById('finalSub').innerText = currentDayCopy.fSub;
-            document.getElementById('ctaBtn').innerText = hour >= 18 ? "收到，准备下班" : "收到，继续搬砖";
-        }
-
-        startRealtimeClock();
-
-        document.querySelectorAll('.tilt-card').forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                const rotateX = (((e.clientY - rect.top) - rect.height / 2) / (rect.height / 2)) * -3.5;
-                const rotateY = (((e.clientX - rect.left) - rect.width / 2) / (rect.width / 2)) * 3.5;
-                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `rotateX(0deg) rotateY(0deg) translateY(0px)`;
-            });
-        });
-
-        const canvas = document.getElementById('fluidOrb');
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-        const size = 225;
-        canvas.width = size * dpr;
-        canvas.height = size * dpr;
-        ctx.scale(dpr, dpr);
-
-        let phase = 0;
-        let speedFactor = 1.0;
-        let calmBreath = false;
-
-        const orbCard = document.getElementById('orbCard');
-        const orbCaption = document.getElementById('orbCaption');
-
-        orbCard.addEventListener('click', () => {
-            calmBreath = !calmBreath;
-            speedFactor = calmBreath ? 0.55 : 1.0;
-            orbCaption.innerText = calmBreath ? "慢节奏呼吸模式 · 吸气 4s / 呼气 4s" : "轻触光球 · 切换深呼吸频率";
-        });
-
-        function drawLiquidBlob(radiusBase, amplitude, speed, colorStops, angleOffset) {
-            ctx.beginPath();
-            const steps = 120;
-            const cx = size / 2;
-            const cy = size / 2;
-            const breathScale = calmBreath ? 1 + Math.sin(phase * 0.7) * 0.14 : 1;
-
-            for (let i = 0; i <= steps; i++) {
-                const theta = (i / steps) * Math.PI * 2;
-                let r;
-
-                if (isHeartMode) {
-                    const heartR = 62 * (1 - 0.28 * Math.sin(theta) + 0.08 * Math.cos(2 * theta));
-                    const ripple = Math.sin(theta * 4 + phase * speed) * (amplitude * 0.45);
-                    r = (heartR + ripple) * breathScale;
-                } else {
-                    const w1 = Math.sin(theta * 3 + phase * speed + angleOffset) * amplitude;
-                    const w2 = Math.cos(theta * 5 - phase * speed * 1.3) * (amplitude * 0.55);
-                    const w3 = Math.sin(theta * 2 + phase * 0.8) * (amplitude * 0.4);
-                    r = (radiusBase + w1 + w2 + w3) * breathScale;
-                }
-
-                const x = cx + Math.cos(theta) * r;
-                const y = cy + Math.sin(theta) * r;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            }
-            ctx.closePath();
-
-            const grad = ctx.createLinearGradient(30, 30, size - 30, size - 30);
-            colorStops.forEach(stop => grad.addColorStop(stop[0], stop[1]));
-            ctx.fillStyle = grad;
-            ctx.fill();
-        }
-
-        function animateOrb() {
-            phase += 0.022 * speedFactor;
-            ctx.clearRect(0, 0, size, size);
-
-            const glow = ctx.createRadialGradient(size/2, size/2, 20, size/2, size/2, 102);
-            glow.addColorStop(0, 'rgba(0, 113, 227, 0.15)');
-            glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            ctx.fillStyle = glow;
-            ctx.fillRect(0, 0, size, size);
-
-            ctx.save();
-            ctx.globalCompositeOperation = 'multiply';
-            drawLiquidBlob(72, 5.5, 1.0, [
-                [0, 'rgba(0, 113, 227, 0.72)'],
-                [1, 'rgba(90, 200, 250, 0.55)']
-            ], 0);
-            drawLiquidBlob(70, 6.0, -0.85, [
-                [0, 'rgba(56, 189, 248, 0.65)'],
-                [1, 'rgba(186, 230, 253, 0.75)']
-            ], 2.1);
-            ctx.restore();
-
-            ctx.save();
-            ctx.globalCompositeOperation = 'screen';
-            drawLiquidBlob(58, 3.8, 1.2, [
-                [0, 'rgba(255, 255, 255, 0.92)'],
-                [0.6, 'rgba(224, 242, 254, 0.45)'],
-                [1, 'rgba(255, 255, 255, 0.05)']
-            ], 4.2);
-            ctx.restore();
-
-            requestAnimationFrame(animateOrb);
-        }
-        animateOrb();
-
-        const ctaBtn = document.getElementById('ctaBtn');
-        const finalTitle = document.getElementById('finalTitle');
-        const finalSub = document.getElementById('finalSub');
-
-        ctaBtn.addEventListener('click', () => {
-            ctaBtn.innerText = "已签收 · 随时出发 ✨";
-            ctaBtn.classList.add('done');
-            finalTitle.innerText = "好嘞，那等你消息！";
-            finalSub.innerText = "餐厅交给我来选，你只需要带上好心情就好。";
-        });
-    </script>
-</body>
+<header class="top"><div class="brand"><i></i><span>BLUE &amp; WHITE</span></div><time class="date" id="date"></time></header>
+<main>
+  <article class="letter">
+    <div class="kicker" id="edition">A NOTE IN THE BLUE</div>
+    <p class="hello" id="hello">嗨，Fred。</p>
+    <h1 class="title" id="title">在无数条可能的轨迹里，<br>今天也想起<span>你</span>。</h1>
+    <p class="poem" id="poem">不是要打断你的一天，只是想把一小段安静的蓝色，放到你路过的地方。<br>忙的时候认真忙，累的时候就停一会儿。</p>
+    <p class="personal" id="personal">愿今天的地铁不太挤，<b>咖啡刚好合口。</b></p>
+    <div class="divider"></div>
+    <div class="code-note"><em id="code">const littleWish = () =&gt; “今天顺顺利利”;</em><br>// 不用回复，收下这点小小的好运就好。</div>
+  </article>
+  <section class="scene" aria-label="可互动的星轨与光球">
+    <canvas id="cosmos" aria-hidden="true"></canvas>
+    <div class="orbit-label" id="orbitLabel">A quiet little universe</div>
+    <button class="planet" id="planet" type="button" aria-label="生成新的随机数学星图" title="轻触星球，生成新的动态数学图形">
+      <svg viewBox="0 0 220 220" aria-hidden="true"><defs><radialGradient id="g" cx="34%" cy="28%"><stop stop-color="#fff"/><stop offset=".4" stop-color="#e7f4ff"/><stop offset=".76" stop-color="#9cc9f2"/><stop offset="1" stop-color="#4f88c0"/></radialGradient><radialGradient id="shine"><stop stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><clipPath id="clip"><circle cx="110" cy="110" r="76"/></clipPath></defs><circle cx="110" cy="110" r="82" fill="none" stroke="#8db8e3" stroke-opacity=".24"/><circle cx="110" cy="110" r="76" fill="url(#g)"/><ellipse cx="80" cy="66" rx="46" ry="34" fill="url(#shine)" opacity=".72"/><g clip-path="url(#clip)" fill="none" stroke="#fff" stroke-opacity=".31"><path d="M20 145 Q95 82 201 117"/><path d="M31 162 Q110 92 206 135"/><path d="M42 72 Q110 122 177 55"/></g><circle cx="82" cy="75" r="4" fill="#fff" opacity=".8"/><circle cx="151" cy="142" r="2.5" fill="#fff" opacity=".7"/></svg>
+    </button>
+    <div class="scene-hint" id="hint">Tap the planet to reveal a new <span>mathematical pattern</span></div>
+  </section>
+</main>
+<footer class="bottom"><div class="thought"><b>A LITTLE THOUGHT</b><span id="thought">宇宙不一定有答案，但总有一颗星会按时出现。</span></div><button class="shuffle" id="shuffle" type="button">换一段心情 ↗</button></footer>
+<script src="./daily-copy.js"></script>
+<script>
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const key='bw-combo-v5';let last=localStorage.getItem(key)||'';
+function makeCopy(){let row,pair,personal,code,thought,signature;do{row=pick(dailyCopy.titleLines);pair=pick(dailyCopy.bodyPairs);personal=pick(dailyCopy.personal);code=pick(dailyCopy.codeBits);thought=pick(dailyCopy.thoughts);signature=[row.join('|'),pair.join(''),personal,code,thought].join('¦')}while(signature===last);last=signature;localStorage.setItem(key,last);const [a,b,c]=row;document.getElementById('title').innerHTML=`<span class="title-line">${a}</span><span class="title-line">${b}<span class="accent">${c}</span>。</span>`;document.getElementById('title').classList.toggle('compact',Math.max(a.length,b.length+c.length)>10);requestAnimationFrame(fitTitle);document.getElementById('poem').textContent=pair.join('');document.getElementById('personal').textContent=personal;document.getElementById('code').textContent=code;document.getElementById('thought').textContent=thought;}
+function fitTitle(){
+ const title=document.getElementById('title');
+ title.style.fontSize='';
+ const style=getComputedStyle(title),base=parseFloat(style.fontSize),available=title.clientWidth-4;
+ const measure=document.createElement('canvas').getContext('2d');measure.font=`${style.fontWeight} ${base}px ${style.fontFamily}`;
+ const widest=Math.max(...[...title.querySelectorAll('.title-line')].map(line=>measure.measureText(line.textContent).width));
+ if(widest>available)title.style.fontSize=`${Math.max(24,base*available/widest)}px`;
+}
+const titleObserver=new ResizeObserver(()=>fitTitle());titleObserver.observe(document.querySelector('.letter'));
+window.addEventListener('resize',fitTitle,{passive:true});
+document.getElementById('date').textContent=new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric',weekday:'long'}).format(new Date());makeCopy();
+document.getElementById('shuffle').addEventListener('click',()=>{makeCopy();newScene();burst();restart();});
+const canvas=document.getElementById('cosmos'),ctx=canvas.getContext('2d'),reduce=matchMedia('(prefers-reduced-motion: reduce)');let phase=0,burstPower=0,raf=0,scene={kind:Math.floor(Math.random()*9),seed:Math.random()*999,arms:3+Math.floor(Math.random()*6),turns:2+Math.random()*5,scale:.34,tilt:Math.random()*Math.PI,moons:[]};
+const palettes=[['#4e91ce','#a7d5fb','#edf7ff'],['#3974b7','#8bbce8','#f4fbff'],['#579fca','#b0dcf4','#fff'],['#5079bd','#acc5f1','#f8fbff'],['#3986b8','#a1d8e9','#effaff']];let palette=pick(palettes);
+function resize(){const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0)}
+function burst(){burstPower=1.35}
+const sceneNames=['Rose Curve','Lissajous Curve','Phyllotaxis','Interference Waves','Spiral Galaxy','Parametric Heart','Butterfly Curve','Spirograph','Lemniscate'];
+function makeMoons(){return Array.from({length:3+Math.floor(Math.random()*3)},(_,i)=>({r:.29+i*.055+Math.random()*.035,flat:.42+Math.random()*.28,tilt:Math.random()*Math.PI,speed:(Math.random()*.35+.18)*(Math.random()<.5?-1:1),offset:Math.random()*Math.PI*2,size:3+Math.random()*4,color:i%3}));}
+scene.moons=makeMoons();document.getElementById('orbitLabel').textContent=sceneNames[scene.kind];
+function newScene(){let kind=Math.floor(Math.random()*9);if(kind===scene.kind)kind=(kind+1+Math.floor(Math.random()*8))%9;scene={kind,seed:Math.random()*999,arms:3+Math.floor(Math.random()*8),turns:2+Math.random()*7,scale:.34+Math.random()*.08,tilt:Math.random()*Math.PI,phase:Math.random()*6,moons:makeMoons()};palette=pick(palettes);document.getElementById('orbitLabel').textContent=sceneNames[kind];}
+function line(points,color,width=1,alpha=1){if(!points.length)return;ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.strokeStyle=color;ctx.globalAlpha=alpha;ctx.lineWidth=width;ctx.stroke();ctx.globalAlpha=1}
+function drawArt(w,h,cx,cy){const R=Math.min(w,h)*scene.scale, pal=palette;ctx.save();ctx.translate(cx,cy);ctx.rotate(scene.tilt+phase*.018);
+if(scene.kind===0){ // rosette / rose curve
+ for(let k=0;k<scene.arms;k++){const pts=[];for(let i=0;i<=420;i++){const t=i/420*Math.PI*2;const r=R*(.18+.78*Math.cos((scene.arms/2)*t+scene.phase+phase*.12));pts.push([Math.cos(t)*r,Math.sin(t)*r])}line(pts,pal[k%3],1.15,.38+k%2*.13)}
+}else if(scene.kind===1){ // Lissajous woven loops
+ for(let j=0;j<5;j++){const pts=[];for(let i=0;i<=520;i++){const t=i/520*Math.PI*2;const x=R*.9*Math.sin((2+scene.arms%3)*t+scene.phase+j*.12+phase*.05),y=R*.7*Math.sin((3+scene.arms%4)*t+phase*.04);pts.push([x,y])}line(pts,pal[j%3],1.2,.48)}
+}else if(scene.kind===2){ // phyllotaxis constellation
+ for(let i=0;i<260;i++){const a=i*2.399963+scene.phase+phase*.055,r=R*Math.sqrt(i/260),x=Math.cos(a)*r,y=Math.sin(a)*r;const size=(1.1+(1-r/R)*2)*(0.72+((i*17)%11)/38);ctx.beginPath();ctx.arc(x,y,size,0,Math.PI*2);ctx.fillStyle=pal[i%3];ctx.globalAlpha=.25+(1-r/R)*.65;ctx.fill();if(i%8===0){ctx.beginPath();ctx.arc(x,y,size*3.8,0,Math.PI*2);ctx.strokeStyle=pal[(i+1)%3];ctx.lineWidth=.65;ctx.globalAlpha=.22;ctx.stroke()}}ctx.globalAlpha=1;
+}else if(scene.kind===3){ // interference rings / wave field
+ for(let j=0;j<11;j++){const pts=[];for(let i=0;i<=360;i++){const t=i/360*Math.PI*2;const r=R*(.25+j*.063)+Math.sin(t*(scene.arms+2)+j*.55+phase*.18)*R*.035;pts.push([Math.cos(t)*r,Math.sin(t)*r])}line(pts,pal[j%3],.9,.3+j*.025)}
+}else if(scene.kind===4){ // spiral galaxy
+ for(let arm=0;arm<scene.arms;arm++){const pts=[];for(let i=0;i<=400;i++){const t=i/400*Math.PI*2*scene.turns,r=R*(.04+.92*i/400),a=t+arm*Math.PI*2/scene.arms+scene.phase+phase*.035;pts.push([Math.cos(a)*r,Math.sin(a)*r*.64])}line(pts,pal[arm%3],1.15,.48)}
+}else if(scene.kind===5){ // parametric heart
+ const pts=[];for(let i=0;i<=520;i++){const t=i/520*Math.PI*2+phase*.025;const x=16*Math.pow(Math.sin(t),3),y=13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);pts.push([x*R/19,-y*R/19])}line(pts,pal[0],2,.78);line(pts,pal[1],.8,.65);
+}else if(scene.kind===6){ // butterfly curve
+ const pts=[];for(let i=0;i<=720;i++){const t=i/720*Math.PI*12+phase*.018;const r=Math.exp(Math.cos(t))-2*Math.cos(4*t)+Math.pow(Math.sin(t/12),5);pts.push([Math.sin(t)*r*R/4.5,Math.cos(t)*r*R/4.5])}line(pts,pal[0],1.2,.58);line(pts.map(([x,y])=>[-x,y]),pal[1],.8,.4);
+}else if(scene.kind===7){ // hypotrochoid spirograph
+ const p=3+scene.arms%5,q=5+scene.arms%4,d=.58;for(let j=0;j<4;j++){const pts=[];for(let i=0;i<=720;i++){const t=i/720*Math.PI*2*q;const x=R*((1-d)*Math.cos(t)+d*Math.cos((1-d)/d*t+j*.035+phase*.025)),y=R*((1-d)*Math.sin(t)-d*Math.sin((1-d)/d*t+j*.035+phase*.025));pts.push([x,y])}line(pts,pal[j%3],1.1,.48)}
+}else{ // lemniscate / infinity curve
+ for(let j=0;j<5;j++){const pts=[];for(let i=0;i<=540;i++){const t=i/540*Math.PI*2+phase*.025+j*.018,den=1+Math.sin(t)*Math.sin(t),x=R*.95*Math.cos(t)/den,y=R*.95*Math.sin(t)*Math.cos(t)/den;pts.push([x,y])}line(pts,pal[j%3],1.1,.5)}
+}
+ctx.restore();
+}
+function frame(){const w=canvas.clientWidth,h=canvas.clientHeight,cx=w/2,cy=h/2;ctx.clearRect(0,0,w,h);
+// ambient stars with deterministic positions per scene
+let seed=scene.seed;const rand=()=>{seed=(seed*9301+49297)%233280;return seed/233280};for(let i=0;i<130;i++){const x=rand()*w,y=rand()*h,r=.45+rand()*1.2,a=.15+rand()*.42;ctx.beginPath();ctx.arc(x,y,r*(.8+.2*Math.sin(phase+i)),0,Math.PI*2);ctx.fillStyle=palette[i%3];ctx.globalAlpha=a;ctx.fill()}ctx.globalAlpha=1;
+// diffuse central bloom
+const bloom=ctx.createRadialGradient(cx,cy,4,cx,cy,Math.min(w,h)*.4);bloom.addColorStop(0,'rgba(119,183,239,.22)');bloom.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=bloom;ctx.fillRect(0,0,w,h);
+drawArt(w,h,cx,cy);
+// Multiple small moons follow independent elliptical orbits around the blue planet.
+for(const moon of scene.moons){const orbit=Math.min(w,h)*moon.r,angle=phase*moon.speed+moon.offset,x=Math.cos(angle)*orbit,y=Math.sin(angle)*orbit*moon.flat,rot=moon.tilt;const ox=x*Math.cos(rot)-y*Math.sin(rot),oy=x*Math.sin(rot)+y*Math.cos(rot);ctx.beginPath();ctx.ellipse(cx,cy,orbit,orbit*moon.flat,rot,0,Math.PI*2);ctx.strokeStyle='rgba(67,127,188,.17)';ctx.lineWidth=.8;ctx.stroke();const mx=cx+ox,my=cy+oy,rad=moon.size;const mg=ctx.createRadialGradient(mx-rad*.35,my-rad*.4,1,mx,my,rad*2.6);mg.addColorStop(0,'#fff');mg.addColorStop(.35,palette[moon.color]);mg.addColorStop(1,'rgba(90,150,205,0)');ctx.fillStyle=mg;ctx.beginPath();ctx.arc(mx,my,rad*2.6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(mx,my,rad,0,Math.PI*2);ctx.fill();}
+if(burstPower>.03){for(let i=0;i<38;i++){const a=i*Math.PI*2/38+scene.seed,r=(1.35-burstPower)*Math.min(w,h)*.38;ctx.beginPath();ctx.arc(cx+Math.cos(a)*r,cy+Math.sin(a)*r,1+burstPower*.65,0,Math.PI*2);ctx.fillStyle=palette[i%3];ctx.globalAlpha=.8;ctx.fill()}ctx.globalAlpha=1}
+if(!reduce.matches){phase+=.012;burstPower*=.955;raf=requestAnimationFrame(frame)}}
+function restart(){cancelAnimationFrame(raf);resize();frame()}new ResizeObserver(restart).observe(canvas);restart();
+document.getElementById('planet').addEventListener('click',()=>{newScene();burst();restart();document.getElementById('hint').innerHTML='A new pattern, just for you <span>· tap again</span>';});
+</script></body>
 </html>
