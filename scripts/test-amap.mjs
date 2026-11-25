@@ -1,8 +1,16 @@
+import https from 'node:https';
 import {appendFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 export function numeric(value){if(typeof value!=='string' && typeof value!=='number')return null;if(String(value).trim()==='')return null;const n=Number(value);return Number.isFinite(n)?n:null}
 export function restaurant(poi){const b=poi.business||{};return {name:typeof poi.name==='string'?poi.name:'未命名餐厅',rating:numeric(b.rating),cost:numeric(b.cost),hours:typeof b.opentime_today==='string'?b.opentime_today:typeof b.opentime_week==='string'?b.opentime_week:null};}
+function requestIPv4(url){
+ return new Promise((resolve,reject)=>{
+  const req=https.get(url,{family:4,signal:AbortSignal.timeout(15000)},res=>{
+   let body='';res.setEncoding('utf8');res.on('data',part=>body+=part);res.on('error',reject);res.on('end',()=>resolve({ok:res.statusCode>=200&&res.statusCode<300,status:res.statusCode,headers:{get:name=>res.headers[name]},json:async()=>JSON.parse(body)}));
+  });req.on('error',reject);
+ });
+}
 async function main(){
  if(!process.env.AMAP_API_KEY){console.error('::error::Missing AMAP_API_KEY repository secret.');process.exitCode=1;return}
  const rows=[];
@@ -12,8 +20,8 @@ async function main(){
    url.search=new URLSearchParams({key:process.env.AMAP_API_KEY,location:'121.4737,31.2304',radius:'3000',types:'050000',keywords,show_fields:'business',page_size:'25',page_num:'1',sortrule:'weight'}).toString();
    let response;
    for(let attempt=1;attempt<=2;attempt++){
-    try{response=await fetch(url,{signal:AbortSignal.timeout(15000),redirect:'error'});break}
-    catch(error){const code=error.name==='TimeoutError'?'TIMEOUT':String(error.cause?.code||'NETWORK').replace(/[^A-Z0-9_]/g,'');console.log(`AMap connection attempt ${attempt}: ${code}`);if(attempt===2)throw Error(`Connection ${code}`)}
+    try{response=await requestIPv4(url);break}
+    catch(error){const code=error.name==='TimeoutError'?'TIMEOUT':String(error.cause?.code||error.code||'NETWORK').replace(/[^A-Z0-9_]/g,'');console.log(`AMap connection attempt ${attempt}: ${code}`);if(attempt===2)throw Error(`Connection ${code}`)}
    }
    if(!response.ok)throw Error(`HTTP ${response.status}`);
    const type=response.headers.get('content-type')||'';if(!type.includes('json'))throw Error('Invalid POI response');
