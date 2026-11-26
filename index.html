@@ -61,6 +61,8 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 .scene-hint{bottom:0;font-size:11px;padding:0;pointer-events:none}
 .holiday-badge{font-size:11px;color:var(--festival-accent);font-weight:500;letter-spacing:.02em}.holiday-badge[hidden]{display:none}body[data-holiday]:not([data-holiday="daily"]) .kicker{color:var(--festival-accent)}body[data-holiday]:not([data-holiday="daily"]) .title .accent{color:var(--festival-accent)}body[data-holiday="christmas"]{background:radial-gradient(ellipse at 76% 25%,#fff 0%,transparent 45%),linear-gradient(135deg,#edf5ff,#d9e9fa 70%,#f5f9ff)}body[data-holiday="spring"],body[data-holiday="lantern"]{background:radial-gradient(ellipse at 85% 20%,#faf0dc99,transparent 40%),linear-gradient(135deg,#f7faff,#e8f2ff 58%,#f7fbff)}
 @media(max-width:760px){.scene{height:390px;min-height:390px}.brand{flex-wrap:wrap;max-width:58%}.orbit-label{max-width:none;line-height:1.5}.holiday-badge{font-size:10px}}
+/* Keep the letter rhythm stable across complete AI sentences of different lengths. */
+.title{min-height:2.44em}.title-line{min-height:1.22em}.poem{min-height:4.2em;line-height:1.85}.personal{min-height:1.75em}
 </style>
 </head>
 <body>
@@ -116,6 +118,7 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 
 <script src="./daily-copy.js"></script>
 <script src="./generated-copy.js"></script>
+<script src="./copy-title.js"></script>
 <script>
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const key='bw-combo-v5';let last=localStorage.getItem(key)||'';
@@ -123,16 +126,17 @@ function makeCopy(){
  if(window.Holiday && window.Holiday.active.id!=='daily'){window.Holiday.applyCopy();return;}
  const dateKey=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const batch=window.aiCopy;
- if(batch?.policyVersion===2 && batch.validUntil>=dateKey && batch.notes?.length){
-   let history=[];try{history=JSON.parse(localStorage.getItem('bw-ai-history')||'[]')}catch{}
-   const candidates=batch.notes.filter(n=>!history.includes(n.first+n.second+n.accent));
+ if(batch?.policyVersion===3 && batch.validUntil>=dateKey && batch.notes?.length && batch.notes.every(n=>window.copyTitleParts(n))){
+   let history=[];try{history=JSON.parse(localStorage.getItem('bw-ai-history-v3')||'[]')}catch{}
+   const candidates=batch.notes.filter(n=>!history.includes(n.title));
    const note=pick(candidates.length?candidates:batch.notes);
-   const signature=note.first+note.second+note.accent;
-   try{localStorage.setItem('bw-ai-history',JSON.stringify([...history,signature].slice(-6)))}catch{}
+   const signature=note.title;
+   try{localStorage.setItem('bw-ai-history-v3',JSON.stringify([...history,signature].slice(-6)))}catch{}
    const title=document.getElementById('title');title.replaceChildren();
    const first=document.createElement('span'),second=document.createElement('span'),accent=document.createElement('span');
-   first.className=second.className='title-line';accent.className='accent';first.textContent=note.first;second.textContent=note.second;accent.textContent=note.accent;second.append(accent);title.append(first,second);
-   title.classList.toggle('compact',Math.max(note.first.length,note.second.length+note.accent.length)>10);
+   const parts=window.copyTitleParts(note);
+   first.className=second.className='title-line';accent.className='accent';first.textContent=parts.first;accent.textContent=parts.accent;second.append(document.createTextNode(parts.before),accent,document.createTextNode(parts.after));title.append(first,second);
+   title.classList.toggle('compact',Math.max(parts.first.length,parts.before.length+parts.accent.length+parts.after.length)>11);
    for(const [id,field] of [['poem','body'],['personal','personal'],['code','code'],['thought','thought']])document.getElementById(id).textContent=note[field];
    requestAnimationFrame(fitTitle);return;
  }
