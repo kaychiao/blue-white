@@ -56,7 +56,7 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 .bottom{flex-wrap:wrap;gap:20px}
 
 .scene{height:clamp(420px,64vh,580px);min-height:420px}.scene:before,.scene:after{display:none}
-.artwork{position:absolute;inset:28px 0 24px;width:100%;border:0;padding:0;background:transparent;border-radius:24px;cursor:pointer;touch-action:pan-y;color:inherit}.artwork:active{cursor:grabbing}.artwork:focus-visible{outline:2px solid #286cb6;outline-offset:3px}#cosmos{width:100%;height:100%}
+.artwork{position:absolute;inset:28px 0 24px;width:100%;border:0;padding:0;background:transparent;border-radius:24px;cursor:pointer;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;color:inherit}.artwork:active{cursor:grabbing}.artwork:focus-visible{outline:2px solid #286cb6;outline-offset:3px}#cosmos{width:100%;height:100%}
 .orbit-label{top:0;left:12px;right:12px;text-align:center;pointer-events:none;font:500 12px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:.09em;transform:none;color:#526f90}.orbit-label:before{content:"✦";font-size:10px}
 .scene-hint{bottom:0;font-size:11px;padding:0;pointer-events:none}
 .holiday-badge{font-size:11px;color:var(--festival-accent);font-weight:500;letter-spacing:.02em}.holiday-badge[hidden]{display:none}body[data-holiday]:not([data-holiday="daily"]) .kicker{color:var(--festival-accent)}body[data-holiday]:not([data-holiday="daily"]) .title .accent{color:var(--festival-accent)}body[data-holiday="christmas"]{background:radial-gradient(ellipse at 76% 25%,#fff 0%,transparent 45%),linear-gradient(135deg,#edf5ff,#d9e9fa 70%,#f5f9ff)}body[data-holiday="spring"],body[data-holiday="lantern"]{background:radial-gradient(ellipse at 85% 20%,#faf0dc99,transparent 40%),linear-gradient(135deg,#f7faff,#e8f2ff 58%,#f7fbff)}
@@ -160,6 +160,7 @@ document.getElementById('shuffle').addEventListener('click',makeCopy);
 <script src="./restaurants.js"></script>
 <script src="./holiday-config.js"></script>
 <script src="./holidays.js"></script>
+<script src="./starlight.js"></script>
 <script src="./scenes.js"></script>
 <script src="./page-refresh.js"></script>
 </body>

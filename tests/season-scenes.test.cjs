@@ -1,12 +1,12 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 function environment(){
- const events={},elements={},handlers={};
+ const events={},elements={},handlers={},timers=new Map();let timeoutId=0;
  const context2d=new Proxy({createRadialGradient:()=>({addColorStop(){}}),measureText:()=>({width:1})},{get(target,key){return key in target?target[key]:(...args)=>{if(['arc','lineTo','moveTo'].includes(key))for(const x of args)assert(Number.isFinite(x),'finite canvas coordinate')}}});
  function el(){return{style:{setProperty(){}},classList:{add(){},toggle(){}},dataset:{},attributes:{},hidden:false,offsetWidth:340,offsetHeight:340,children:[],textContent:'',value:'',width:300,height:300,append(...x){this.children.push(...x)},replaceChildren(){this.children=[]},getContext:()=>context2d,getBoundingClientRect:()=>({width:420,height:400,top:520,bottom:564,left:420}),setAttribute(key,value){this.attributes[key]=value},focus(){doc.activeElement=this},scrollIntoView(){},contains(target){return target===this||this.children.some(x=>x.contains(target))},addEventListener(e,f){(handlers[this.id+'-'+e]??=[]).push(f)}}}
  const doc={hidden:false,documentElement:{clientWidth:1280},body:el(),getElementById(id){if(!elements[id]){elements[id]=el();elements[id].id=id}return elements[id]},createElement:()=>el(),addEventListener(e,f){(events[e]??=[]).push(f)},dispatchEvent(e){for(const f of events[e.type]||[])f(e)}};
  const window={innerHeight:900,addEventListener(){},holidayConfig:{specialDates:[]}};let raf=0;
- const c={document:doc,window,Intl,Date,Math,Object,Array,Set,Number,devicePixelRatio:2,CustomEvent:class{constructor(type,o){this.type=type;this.detail=o.detail}},matchMedia:()=>({matches:true,addEventListener(){}}),performance:{now:()=>0},requestAnimationFrame:()=>++raf,cancelAnimationFrame(){},ResizeObserver:class{observe(){}},setInterval(){},fitTitle(){},makeCopy(){window.Holiday?.applyCopy()}};
- vm.createContext(c);return {c,window,doc,elements,handlers};
+ const c={document:doc,window,Intl,Date,Math,Object,Array,Set,Number,devicePixelRatio:2,CustomEvent:class{constructor(type,o){this.type=type;this.detail=o.detail}},matchMedia:()=>({matches:true,addEventListener(){}}),performance:{now:()=>0},requestAnimationFrame:()=>++raf,cancelAnimationFrame(){},ResizeObserver:class{observe(){}},setInterval(){},setTimeout(fn,ms){const id=++timeoutId;timers.set(id,{fn,ms});return id},clearTimeout(id){timers.delete(id)},fitTitle(){},makeCopy(){window.Holiday?.applyCopy()}};
+ vm.createContext(c);return {c,window,doc,elements,handlers,timers};
 }
 test('Shanghai solar and lunar holidays, special dates and automatic holiday copy',()=>{
  const {c,window,doc,handlers}=environment();vm.runInContext(fs.readFileSync('holidays.js','utf8'),c);const detect=s=>window.Holiday.detect(new Date(s));
@@ -45,4 +45,14 @@ test('Click cycles scenes without repeats; dragging rotates without switching; k
  const beforeDrag=label();handlers['artwork-pointerdown'][0]({clientX:10,clientY:10});for(let x=11;x<25;x++)handlers['artwork-pointermove'][0]({clientX:x,clientY:10});handlers['artwork-pointerup'][0]();click(1);assert.equal(label(),beforeDrag);
  click(0);assert.notEqual(label(),beforeDrag,'keyboard click switches scenes');assert.match(elements.artwork.attributes['aria-label'],/点击切换/);
  const html=fs.readFileSync('index.html','utf8');for(const removed of ['sceneSelect','sceneGallery','scenePrevious','sceneNext','holidayTheme'])assert(!html.includes('id="'+removed+'"'));
+});
+
+test('Long-press secret and scene switching cooperate without changing the selected artwork',()=>{
+ const {c,window,elements,handlers,timers}=environment();vm.runInContext(fs.readFileSync('starlight.js','utf8'),c);vm.runInContext(fs.readFileSync('scenes.js','utf8'),c);window.MathScenes.choose('stars');
+ const before=elements.artwork.attributes['aria-label'];
+ for(const fn of handlers['artwork-pointerdown'])fn({clientX:20,clientY:20,button:0});
+ const hold=[...timers.values()].find(t=>t.ms===1000);assert(hold);hold.fn();assert.equal(elements.orbitLabel.textContent,'You crossed my mind.');
+ for(const fn of handlers['artwork-pointerup'])fn({});for(const fn of handlers['artwork-click'])fn({detail:1});assert.equal(elements.artwork.attributes['aria-label'],before);
+ const end=[...timers.values()].find(t=>t.ms===8200);assert(end);end.fn();assert.equal(elements.orbitLabel.textContent,'Binary Stars');
+ for(const fn of handlers['artwork-pointerdown'])fn({clientX:20,clientY:20,button:0});for(const fn of handlers['artwork-pointerup'])fn({});for(const fn of handlers['artwork-click'])fn({detail:1});assert.notEqual(elements.artwork.attributes['aria-label'],before);
 });

@@ -2,7 +2,7 @@
  const TAU=Math.PI*2,canvas=document.getElementById('cosmos'),ctx=canvas.getContext('2d'),button=document.getElementById('artwork'),motion=matchMedia('(prefers-reduced-motion: reduce)');
  const scenes=[['stars','双星共舞','Two paths, one quiet moment'],['mobius','莫比乌斯环','A little infinity'],['trefoil','三叶结','One unbroken thread'],['heart','心形曲面','A shape for a quiet feeling'],['lissajous','李萨如共振','Finding our frequency'],['rose','玫瑰旋轮线','A flower drawn by numbers'],['garden','黄金角花园','Small things grow into light'],['butterfly','蝴蝶曲线','A little room to flutter'],['lorenz','洛伦兹轨迹','Beautifully unpredictable'],['sea','月光海面','Let the waves take their time'],['klein','克莱因瓶','Another way to see inside'],['surfaces','相遇的曲面','Somewhere our worlds overlap']];
  const holidayScenes=[['tree','分形圣诞树','A small tree of light'],['lantern','几何灯笼','A warm little wish'],['year','新年星光','A new chapter begins'],['bridge','双星光桥','A little closer across the sky'],['moon','中秋月相','The moon keeps a little light']];
- const catalog=[...scenes,...holidayScenes];let id='',seed=Math.random()*TAU,t=0,raf=0,last=0,pulse=0,rx=.22,ry=0,drag=null,moved=false,transition=1,previousImage=null;let deck=[];let lorenz=[];let yearPoints=[];
+ const catalog=[...scenes,...holidayScenes];let id='',seed=Math.random()*TAU,t=0,raf=0,last=0,pulse=0,rx=.22,ry=0,drag=null,moved=false,transition=1,previousImage=null;let deck=[];let lorenz=[];let yearPoints=[];let secret;
  const stars=Array.from({length:85},()=>[Math.random(),Math.random(),Math.random()*1.1+.4,Math.random()*TAU]);
  function lorenzPoints(){let x=.1,y=0,z=0;const out=[];for(let i=0;i<2900;i++){const dt=.008,dx=10*(y-x),dy=x*(28-z)-y,dz=x*y-8*z/3;x+=dx*dt;y+=dy*dt;z+=dz*dt;if(i>200&&i%2===0)out.push([x/20,(z-25)/22,y/24])}return out}
  lorenz=lorenzPoints();
@@ -62,6 +62,7 @@
   if(theme()==='christmas')for(let i=0;i<35;i++){const x=(stars[i][0]*w+t*3)%w,y=(stars[i][1]*h+t*(6+i%4))%h;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,1+i%2,0,TAU);ctx.fill()}
   if(pulse>0){for(let i=0;i<30;i++){const a=i/30*TAU,r=(1-pulse)*Math.min(w,h)*.48;ctx.globalAlpha=pulse;ctx.fillStyle=pal[i%3];ctx.beginPath();ctx.arc(w/2+Math.cos(a)*r,h/2+Math.sin(a)*r,1.7,0,TAU);ctx.fill()}ctx.globalAlpha=1;pulse=motion.matches?0:Math.max(0,pulse-.025)}
   if(previousImage&&transition<1){ctx.globalAlpha=1-transition;ctx.drawImage(previousImage,0,0,w,h);ctx.globalAlpha=1;transition+=.06}
+  secret?.draw(ctx,w,h,t);
   if(!motion.matches&&!document.hidden)raf=requestAnimationFrame(frame);
  }
  function redraw(){cancelAnimationFrame(raf);last=0;frame(performance.now())}
@@ -74,7 +75,7 @@
    const pixels=tc.getImageData(0,0,300,100)?.data;if(pixels)for(let y=0;y<100;y+=3)for(let x=0;x<300;x+=3)if(pixels[(y*300+x)*4+3]>100)yearPoints.push([(x-150)/110,(50-y)/100,0]);pulse=1;
   }
   const meta=catalog.find(x=>x[0]===id);
-  document.getElementById('orbitLabel').textContent=englishNames[id];
+  if(secret)secret.syncLabel();else document.getElementById('orbitLabel').textContent=englishNames[id];
   button.setAttribute('aria-label',`${meta[1]}：点击切换下一个图形，拖动旋转`);
   document.getElementById('hint').textContent='Tap for another little universe · drag to turn';
   redraw();
@@ -92,8 +93,9 @@
  button.addEventListener('pointerup',()=>{drag=null});
  button.addEventListener('pointercancel',()=>{drag=null;moved=true});
  button.addEventListener('lostpointercapture',()=>{drag=null});
- button.addEventListener('click',e=>{if(moved&&e.detail!==0){moved=false;return}moved=false;next()});
+ button.addEventListener('click',e=>{if(secret?.consumeClick()){moved=false;return}if(moved&&e.detail!==0){moved=false;return}moved=false;next()});
  document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(raf);if(!document.hidden)redraw()});motion.addEventListener('change',redraw);new ResizeObserver(redraw).observe(canvas);
  document.addEventListener('holidaychange',event=>{if(event.detail.changed){deck=[];choose(event.detail.scene||scenes[Math.floor(Math.random()*scenes.length)][0])}});
- window.MathScenes={choose,next,catalog};choose(window.Holiday?.templates[theme()]?.scene||scenes[Math.floor(Math.random()*scenes.length)][0]);
+ secret=window.createStarSecret?.({button,label:document.getElementById('orbitLabel'),getLabel:()=>englishNames[id]||'A little universe',redraw,reducedMotion:()=>motion.matches});
+ window.MathScenes={choose,next,catalog};choose(window.Holiday?.templates[theme()]?.scene||scenes[Math.floor(Math.random()*scenes.length)][0]);secret?.checkClock();
 })();

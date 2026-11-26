@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: '22'
       - name: Verify copy timing and content rules
-        run: node --test tests/season-scenes.test.cjs tests/copy-generation.test.mjs
+        run: node --test tests/season-scenes.test.cjs tests/copy-generation.test.mjs tests/starlight.test.cjs
       - name: Restore last valid AI batch
         uses: actions/cache/restore@v4
         with:
@@ -71,7 +71,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir -p _site
-          cp index.html copy-title.js daily-copy.js generated-copy.js weather.js weather-data.js longing.js amap-config.js restaurants.js page-refresh.js holiday-config.js holidays.js scenes.js _site/
+          cp index.html copy-title.js daily-copy.js generated-copy.js weather.js weather-data.js longing.js amap-config.js restaurants.js page-refresh.js holiday-config.js holidays.js starlight.js scenes.js _site/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
