@@ -22,3 +22,11 @@ test('Manual fallback does not turn past events into yesterday or last night',as
  const strings=[];function collect(value){if(typeof value==='string')strings.push(value);else if(Array.isArray(value))value.forEach(collect);else if(value&&typeof value==='object')Object.values(value).forEach(collect)}collect(context.window.dailyCopy);
  assert(strings.length>100);for(const text of strings)assert(!/昨天|昨晚|前天|前两天|前几天/.test(text),text);
 });
+test('Gemini repairs invalid content once and never retries HTTP failures',async()=>{
+ const {generateValidatedCopy}=await import('../scripts/generate-copy.mjs');
+ let calls=0;const invalid=fixture();invalid.notes[0].body='昨晚吃了手抛饭';invalid.notes[1].personal='很'.repeat(33);
+ const fetcher=async(url,options)=>{calls++;if(calls===2){const request=JSON.parse(options.body);assert.equal(request.contents.length,3);const feedback=request.contents[2].parts[0].text;assert.match(feedback,/relative time or date/);assert.match(feedback,/length 33 exceeds 32/)}return{ok:true,json:async()=>({candidates:[{content:{parts:[{text:JSON.stringify(calls===1?invalid:fixture())}]}}]})}};
+ assert.equal((await generateValidatedCopy('test','test-model','not-a-real-key',fetcher)).notes.length,8);assert.equal(calls,2);
+ calls=0;await assert.rejects(()=>generateValidatedCopy('test','test-model','not-a-real-key',async()=>{calls++;return{ok:false,status:402}}),/HTTP 402/);assert.equal(calls,1);
+ calls=0;await assert.rejects(()=>generateValidatedCopy('test','test-model','not-a-real-key',async()=>{calls++;return{ok:true,json:async()=>({candidates:[{content:{parts:[{text:JSON.stringify(invalid)}]}}]})}}),/Invalid field/);assert.equal(calls,2);
+});

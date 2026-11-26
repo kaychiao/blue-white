@@ -13,19 +13,41 @@ const limits = { first:12, second:12, accent:6, body:70, personal:32, code:48, t
 export function validate(data) {
   if (!Array.isArray(data?.notes) || data.notes.length < 8 || data.notes.length > 16) throw new Error('Expected 8–16 notes');
   const seen = new Set();
-  for (const note of data.notes) {
+  const errors = [];
+  for (const [index,note] of data.notes.entries()) {
     for (const [field, max] of Object.entries(limits)) {
-      const value = note[field];
-      if (typeof value !== 'string' || !value.trim() || [...value].length > max || /[<>\n\r]|```|手抓饭|bug/i.test(value) || unsafeTime.test(value)) throw new Error(`Invalid field: ${field}`);
+      const value = note?.[field];
+      const reason = typeof value !== 'string' || !value.trim() ? 'missing text' : [...value].length > max ? `length ${[...value].length} exceeds ${max}` : /[<>\n\r]|```|手抓饭|bug/i.test(value) ? 'unsupported markup or content' : unsafeTime.test(value) ? 'relative time or date' : '';
+      if (reason) errors.push(`note ${index+1}: Invalid field: ${field} (${reason})`);
     }
-    if ([...note.second + note.accent].length > 12) throw new Error('Second title line too long');
+    if (!note || Object.keys(limits).some(field=>typeof note[field]!=='string')) continue;
+    if ([...note.second + note.accent].length > 12) errors.push(`note ${index+1}: Second title line too long`);
     const signature = note.first + note.second + note.accent;
-    if (seen.has(signature)) throw new Error('Duplicate title');
+    if (seen.has(signature)) errors.push(`note ${index+1}: Duplicate title`);
     seen.add(signature);
   }
+  if (errors.length) throw new Error(errors.join('; '));
   return data;
 }
 const schema = { type:'object', properties:{ notes:{type:'array', items:{type:'object', properties:Object.fromEntries(Object.keys(limits).map(k=>[k,{type:'string'}])), required:Object.keys(limits)}}}, required:['notes'] };
+export async function generateValidatedCopy(prompt, model, apiKey, fetcher = fetch) {
+  const contents=[{role:'user',parts:[{text:prompt}]}];
+  for(let attempt=0;attempt<2;attempt++){
+    const response=await fetcher(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{
+      method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':apiKey},
+      body:JSON.stringify({contents,generationConfig:{responseMimeType:'application/json',responseSchema:schema,maxOutputTokens:8192}}),signal:AbortSignal.timeout(90000)
+    });
+    if(!response.ok)throw new Error(`Gemini HTTP ${response.status}`);
+    const result=await response.json();
+    const text=result.candidates?.[0]?.content?.parts?.filter(p=>!p.thought).map(p=>p.text||'').join('');
+    try{return validate(JSON.parse(text));}catch(error){
+      if(attempt===1)throw error;
+      const feedback=error instanceof SyntaxError?'Invalid JSON':error.message;
+      console.log('Gemini response needs one validation repair.');
+      contents.push({role:'model',parts:[{text}]},{role:'user',parts:[{text:`重写上一批全部短笺，严格修复所有校验问题。只输出 JSON。字符数包含标点、空格、英文，每个字段上限：${JSON.stringify(limits)}；second 与 accent 合计不得超过12字符。正文尽量20–45字，落款8–22字。过往事件只用“之前”“那次”，不写任何相对时间或具体日期。不要改变事实。校验反馈：${feedback}`} ]});
+    }
+  }
+}
 export function activeEvents(recent, dateKey = today()) {
   if (!Array.isArray(recent?.events)) throw new Error('FRED_RECENT events must be an array');
   const isoDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0,10) === value;
@@ -59,15 +81,8 @@ async function main() {
         model = preferred.name.replace(/^models\//,'');
       }
       console.log(`Generating with model: ${model}`);
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-        method:'POST', headers:{'Content-Type':'application/json','x-goog-api-key':process.env.GEMINI_API_KEY},
-        body:JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{responseMimeType:'application/json',responseSchema:schema,maxOutputTokens:8192}}),
-        signal:AbortSignal.timeout(90000)
-      });
-      if (!response.ok) throw new Error(`Gemini HTTP ${response.status}`);
-      const result = await response.json();
-      const text = result.candidates?.[0]?.content?.parts?.filter(p=>!p.thought).map(p=>p.text||'').join('');
-      batch = {notes:validate(JSON.parse(text)).notes.map(note=>Object.fromEntries(Object.keys(limits).map(k=>[k,note[k]])))};
+      const generated = await generateValidatedCopy(prompt,model,process.env.GEMINI_API_KEY);
+      batch = {notes:generated.notes.map(note=>Object.fromEntries(Object.keys(limits).map(k=>[k,note[k]])))};
       batch.policyVersion = COPY_POLICY_VERSION;
       batch.generatedAt = new Date().toISOString();
       // Expire facts along with the earliest active event; do not extend old copy on failure.
