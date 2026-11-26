@@ -19,7 +19,7 @@
   try{const l=parts(date,'en-u-ca-chinese');if(!/bis|闰/i.test(l.month)){const lm=+l.month,ld=+l.day;if(lm===1&&ld<=7)return{id:'spring'};if(lm===1&&ld===15)return{id:'lantern'};if(lm===7&&ld===7)return{id:'qixi'};if(lm===8&&ld===15)return{id:'moon'}}}catch{}
   return {id:'daily'};
  }
- let selection='auto',active={id:'daily'},variant=0;
+ let active={id:'daily'},variant=0;
  function applyCopy(){
   if(active.id==='daily')return;
   const t=templates[active.id];if(!t)return;
@@ -29,15 +29,14 @@
   document.getElementById('edition').textContent=`FOR FRED · ${active.label||t.label}`;requestAnimationFrame(fitTitle);
  }
  function update(){
-  const next=selection==='auto'?detect():{id:selection};const changed=next.id!==active.id;active=next;
+  const next=detect();const changed=next.id!==active.id;active=next;
   document.body.dataset.holiday=active.id;
   document.body.style.setProperty('--festival-accent',templates[active.id]?.accent||'#286cb6');
-  const badge=document.getElementById('holidayBadge');badge.textContent=active.id==='daily'?'':`${selection==='auto'?'':'预览 · '}${active.label||templates[active.id].label}`;badge.hidden=active.id==='daily';
+  const badge=document.getElementById('holidayBadge');badge.textContent=active.id==='daily'?'':`${active.label||templates[active.id].label}`;badge.hidden=active.id==='daily';
   if(active.id==='daily')document.getElementById('edition').textContent='A NOTE IN THE BLUE';
   document.dispatchEvent(new CustomEvent('holidaychange',{detail:{...active,scene:templates[active.id]?.scene,changed}}));
   return active;
  }
  window.Holiday={detect,applyCopy,update,get active(){return active},templates};
- document.getElementById('holidayTheme').addEventListener('change',e=>{selection=e.target.value;update();makeCopy()});
  update();makeCopy();setInterval(()=>{if(!document.hidden){const previous=active.id;update();if(previous!==active.id)makeCopy()}},60000);
 })();
