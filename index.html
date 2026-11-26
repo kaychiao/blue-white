@@ -53,12 +53,14 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 .food-location-controls{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px}.food-location-form{display:flex;flex:1;gap:8px;min-width:240px}.food-location-form input{flex:1;min-width:0;min-height:44px;padding:10px 14px;border:1px solid #adc7e2;border-radius:12px;background:#f7faff;color:#294c72;font:14px -apple-system,BlinkMacSystemFont,sans-serif}.food-location-form input::placeholder{color:#526c87}.food-location-form input:focus-visible{outline:2px solid #286cb6;outline-offset:2px}.food-location-controls button{min-height:44px}.food-location-controls button:disabled{opacity:.45;cursor:wait}.food-location-options{display:grid;gap:8px;margin:14px 0}.place-option{text-align:left;padding:12px 16px;min-height:44px;border:1px solid #c8daed;border-radius:12px;background:#f7faff;color:#294c72;font:14px/1.6 -apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer}.place-option:hover{background:#e5effb}.place-option:focus-visible{outline:2px solid #286cb6;outline-offset:2px}.visually-hidden{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media(max-width:480px){.food-location-form{flex-basis:100%;min-width:0}.food-location-form .shuffle{padding:10px 14px}}
 
-.refresh-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.refresh-label{font-size:12px;color:#4c6584}.refresh-select{min-height:44px;border:1px solid #c4d7eb;border-radius:12px;background:#f7faff;color:#315f91;padding:8px;font:13px -apple-system,BlinkMacSystemFont,sans-serif}.refresh-select:focus-visible{outline:2px solid #286cb6;outline-offset:3px}.bottom{flex-wrap:wrap;gap:20px}
-@media(max-width:760px){.refresh-controls{width:100%}.refresh-controls .shuffle{margin-left:auto}}
+.bottom{flex-wrap:wrap;gap:20px}
+
+.scene{height:clamp(360px,55vh,510px);min-height:360px}.scene:before,.scene:after{display:none}.artwork{position:absolute;inset:0 0 62px;width:100%;border:0;padding:0;background:transparent;border-radius:24px;cursor:grab;touch-action:pan-y;color:inherit}.artwork:active{cursor:grabbing}.artwork:focus-visible{outline:2px solid #286cb6;outline-offset:3px}#cosmos{width:100%;height:100%}.orbit-label{top:3%;pointer-events:none;font-size:11px;transform:rotate(4deg)}.scene-nav{position:absolute;bottom:22px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:7px}.scene-nav button{width:44px;height:44px;border:0;background:transparent;border-radius:50%;color:#315f91;font-size:20px;cursor:pointer}.scene-nav button:hover{background:#dfeafa}.scene-nav select{max-width:65%;min-height:44px;padding:8px 24px 8px 12px;border:0;background:transparent;color:#315f91;font:13px -apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer}.scene-nav button:focus-visible,.scene-nav select:focus-visible{outline:2px solid #286cb6;outline-offset:2px}.scene-hint{bottom:0;font-size:11px;padding:0;pointer-events:none}.theme-preview{max-width:1060px;margin:0 auto 24px;color:#4c6584;font-size:12px;padding:0}.theme-preview summary{min-height:36px;cursor:pointer;width:fit-content;line-height:36px}.theme-preview label{margin-right:12px}.theme-preview select{padding:9px;min-height:44px;color:#315f91;border:1px solid #c4d7eb;border-radius:10px;background:#f7faff}.theme-preview p{font-size:11px;line-height:1.7}.holiday-badge{font-size:11px;color:var(--festival-accent);font-weight:500;letter-spacing:.02em}.holiday-badge[hidden]{display:none}body[data-holiday]:not([data-holiday="daily"]) .kicker{color:var(--festival-accent)}body[data-holiday]:not([data-holiday="daily"]) .title .accent{color:var(--festival-accent)}body[data-holiday="christmas"]{background:radial-gradient(ellipse at 76% 25%,#fff 0%,transparent 45%),linear-gradient(135deg,#edf5ff,#d9e9fa 70%,#f5f9ff)}body[data-holiday="spring"],body[data-holiday="lantern"]{background:radial-gradient(ellipse at 85% 20%,#faf0dc99,transparent 40%),linear-gradient(135deg,#f7faff,#e8f2ff 58%,#f7fbff)}
+@media(max-width:1120px){.theme-preview{margin-left:30px;margin-right:30px}}@media(max-width:760px){.scene{height:360px;min-height:340px}.theme-preview{margin-left:23px;margin-right:23px}.brand{flex-wrap:wrap;max-width:58%}.orbit-label{max-width:85%;line-height:1.5}.holiday-badge{font-size:10px}}
 </style>
 </head>
 <body>
-<header class="top"><div class="brand"><i></i><span>BLUE &amp; WHITE</span></div>
+<header class="top"><div class="brand"><i></i><span>BLUE &amp; WHITE</span><span id="holidayBadge" class="holiday-badge" hidden></span></div>
   <div class="clock-widget"><div class="clock-copy"><span class="date" id="date"></span><time class="live-time" id="liveTime" aria-label="上海时间">--:--:--</time></div><div class="clock-face" aria-hidden="true"><i class="hand hour-hand" id="hourHand"></i><i class="hand minute-hand" id="minuteHand"></i><i class="hand second-hand" id="secondHand"></i></div></div>
 </header>
 <main>
@@ -78,12 +80,10 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
   </article>
   <div class="visual-column">
   <section class="scene" aria-label="可互动的星轨与光球">
-    <canvas id="cosmos" aria-hidden="true"></canvas>
-    <div class="orbit-label" id="orbitLabel">A quiet little universe</div>
-    <button class="planet" id="planet" type="button" aria-label="生成新的随机数学星图" title="轻触星球，生成新的动态数学图形">
-      <svg viewBox="0 0 220 220" aria-hidden="true"><defs><radialGradient id="g" cx="34%" cy="28%"><stop stop-color="#fff"/><stop offset=".4" stop-color="#e7f4ff"/><stop offset=".76" stop-color="#9cc9f2"/><stop offset="1" stop-color="#4f88c0"/></radialGradient><radialGradient id="shine"><stop stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><clipPath id="clip"><circle cx="110" cy="110" r="76"/></clipPath></defs><circle cx="110" cy="110" r="82" fill="none" stroke="#8db8e3" stroke-opacity=".24"/><circle cx="110" cy="110" r="76" fill="url(#g)"/><ellipse cx="80" cy="66" rx="46" ry="34" fill="url(#shine)" opacity=".72"/><g clip-path="url(#clip)" fill="none" stroke="#fff" stroke-opacity=".31"><path d="M20 145 Q95 82 201 117"/><path d="M31 162 Q110 92 206 135"/><path d="M42 72 Q110 122 177 55"/></g><circle cx="82" cy="75" r="4" fill="#fff" opacity=".8"/><circle cx="151" cy="142" r="2.5" fill="#fff" opacity=".7"/></svg>
-    </button>
-    <div class="scene-hint" id="hint">Tap the planet to reveal a new <span>mathematical pattern</span></div>
+    <button class="artwork" id="artwork" type="button" aria-label="数学小宇宙，点击互动或拖动旋转"><canvas id="cosmos" aria-hidden="true"></canvas></button>
+    <div class="orbit-label" id="orbitLabel">A little infinity</div>
+    <div class="scene-nav"><button id="scenePrevious" type="button" aria-label="上一个数学场景">←</button><label for="sceneSelect" class="visually-hidden">选择数学场景</label><select id="sceneSelect"></select><button id="sceneNext" type="button" aria-label="随机下一个数学场景">→</button></div>
+    <div class="scene-hint" id="hint">Tap to leave a little light · drag to turn</div>
   </section>
 <details class="weather-panel weather-disclosure" id="weatherPanel" aria-label="上海市天气" aria-busy="true">
   <summary class="weather-summary">
@@ -109,13 +109,15 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
   <div class="restaurant-grid" id="restaurantList"></div>
   <p class="food-notice">评分、人均和营业时间以高德返回为准；暂无评分的店不会标为高分。出发前请到地图确认。</p>
 </details>
-<footer class="bottom"><div class="thought"><b>A LITTLE THOUGHT</b><span id="thought">宇宙不一定有答案，但总有一颗星会按时出现。</span></div><div class="refresh-controls"><label class="refresh-label" for="refreshInterval">自动换一句</label><select id="refreshInterval" class="refresh-select"><option value="10">10 秒</option><option value="30">30 秒</option><option value="60">1 分钟</option><option value="0">暂停</option></select><button class="shuffle" id="shuffle" type="button">换一段心情 ↗</button></div></footer>
+<footer class="bottom"><div class="thought"><b>A LITTLE THOUGHT</b><span id="thought">宇宙不一定有答案，但总有一颗星会按时出现。</span></div><button class="shuffle" id="shuffle" type="button">换一段心情 ↗</button></footer>
+<details class="theme-preview"><summary>主题预览</summary><label for="holidayTheme">节日氛围</label><select id="holidayTheme"><option value="auto">跟随上海日期</option><option value="daily">日常蓝白</option><option value="newyear">元旦</option><option value="spring">春节</option><option value="christmas">圣诞节</option><option value="lantern">元宵节</option><option value="qixi">七夕</option><option value="moon">中秋节</option></select><p>预览只在当前页面生效。生日与纪念日可在 holiday-config.js 中配置。</p></details>
 <script src="./daily-copy.js"></script>
 <script src="./generated-copy.js"></script>
 <script>
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const key='bw-combo-v5';let last=localStorage.getItem(key)||'';
 function makeCopy(){
+ if(window.Holiday && window.Holiday.active.id!=='daily'){window.Holiday.applyCopy();return;}
  const dateKey=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const batch=window.aiCopy;
  if(batch?.validUntil>=dateKey && batch.notes?.length){
@@ -143,55 +145,15 @@ function fitTitle(){
 const titleObserver=new ResizeObserver(()=>fitTitle());titleObserver.observe(document.querySelector('.letter'));
 window.addEventListener('resize',fitTitle,{passive:true});
 makeCopy();
-document.getElementById('shuffle').addEventListener('click',()=>{makeCopy();newScene();burst();restart();});
-const canvas=document.getElementById('cosmos'),ctx=canvas.getContext('2d'),reduce=matchMedia('(prefers-reduced-motion: reduce)');let phase=0,burstPower=0,raf=0,scene={kind:Math.floor(Math.random()*9),seed:Math.random()*999,arms:3+Math.floor(Math.random()*6),turns:2+Math.random()*5,scale:.34,tilt:Math.random()*Math.PI,moons:[]};
-const palettes=[['#4e91ce','#a7d5fb','#edf7ff'],['#3974b7','#8bbce8','#f4fbff'],['#579fca','#b0dcf4','#fff'],['#5079bd','#acc5f1','#f8fbff'],['#3986b8','#a1d8e9','#effaff']];let palette=pick(palettes);
-function resize(){const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0)}
-function burst(){burstPower=1.35}
-const sceneNames=['Rose Curve','Lissajous Curve','Phyllotaxis','Interference Waves','Spiral Galaxy','Parametric Heart','Butterfly Curve','Spirograph','Lemniscate'];
-function makeMoons(){return Array.from({length:3+Math.floor(Math.random()*3)},(_,i)=>({r:.29+i*.055+Math.random()*.035,flat:.42+Math.random()*.28,tilt:Math.random()*Math.PI,speed:(Math.random()*.35+.18)*(Math.random()<.5?-1:1),offset:Math.random()*Math.PI*2,size:3+Math.random()*4,color:i%3}));}
-scene.moons=makeMoons();document.getElementById('orbitLabel').textContent=sceneNames[scene.kind];
-function newScene(){let kind=Math.floor(Math.random()*9);if(kind===scene.kind)kind=(kind+1+Math.floor(Math.random()*8))%9;scene={kind,seed:Math.random()*999,arms:3+Math.floor(Math.random()*8),turns:2+Math.random()*7,scale:.34+Math.random()*.08,tilt:Math.random()*Math.PI,phase:Math.random()*6,moons:makeMoons()};palette=pick(palettes);document.getElementById('orbitLabel').textContent=sceneNames[kind];}
-function line(points,color,width=1,alpha=1){if(!points.length)return;ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.strokeStyle=color;ctx.globalAlpha=alpha;ctx.lineWidth=width;ctx.stroke();ctx.globalAlpha=1}
-function drawArt(w,h,cx,cy){const R=Math.min(w,h)*scene.scale, pal=palette;ctx.save();ctx.translate(cx,cy);ctx.rotate(scene.tilt+phase*.018);
-if(scene.kind===0){ // rosette / rose curve
- for(let k=0;k<scene.arms;k++){const pts=[];for(let i=0;i<=420;i++){const t=i/420*Math.PI*2;const r=R*(.18+.78*Math.cos((scene.arms/2)*t+scene.phase+phase*.12));pts.push([Math.cos(t)*r,Math.sin(t)*r])}line(pts,pal[k%3],1.15,.38+k%2*.13)}
-}else if(scene.kind===1){ // Lissajous woven loops
- for(let j=0;j<5;j++){const pts=[];for(let i=0;i<=520;i++){const t=i/520*Math.PI*2;const x=R*.9*Math.sin((2+scene.arms%3)*t+scene.phase+j*.12+phase*.05),y=R*.7*Math.sin((3+scene.arms%4)*t+phase*.04);pts.push([x,y])}line(pts,pal[j%3],1.2,.48)}
-}else if(scene.kind===2){ // phyllotaxis constellation
- for(let i=0;i<260;i++){const a=i*2.399963+scene.phase+phase*.055,r=R*Math.sqrt(i/260),x=Math.cos(a)*r,y=Math.sin(a)*r;const size=(1.1+(1-r/R)*2)*(0.72+((i*17)%11)/38);ctx.beginPath();ctx.arc(x,y,size,0,Math.PI*2);ctx.fillStyle=pal[i%3];ctx.globalAlpha=.25+(1-r/R)*.65;ctx.fill();if(i%8===0){ctx.beginPath();ctx.arc(x,y,size*3.8,0,Math.PI*2);ctx.strokeStyle=pal[(i+1)%3];ctx.lineWidth=.65;ctx.globalAlpha=.22;ctx.stroke()}}ctx.globalAlpha=1;
-}else if(scene.kind===3){ // interference rings / wave field
- for(let j=0;j<11;j++){const pts=[];for(let i=0;i<=360;i++){const t=i/360*Math.PI*2;const r=R*(.25+j*.063)+Math.sin(t*(scene.arms+2)+j*.55+phase*.18)*R*.035;pts.push([Math.cos(t)*r,Math.sin(t)*r])}line(pts,pal[j%3],.9,.3+j*.025)}
-}else if(scene.kind===4){ // spiral galaxy
- for(let arm=0;arm<scene.arms;arm++){const pts=[];for(let i=0;i<=400;i++){const t=i/400*Math.PI*2*scene.turns,r=R*(.04+.92*i/400),a=t+arm*Math.PI*2/scene.arms+scene.phase+phase*.035;pts.push([Math.cos(a)*r,Math.sin(a)*r*.64])}line(pts,pal[arm%3],1.15,.48)}
-}else if(scene.kind===5){ // parametric heart
- const pts=[];for(let i=0;i<=520;i++){const t=i/520*Math.PI*2+phase*.025;const x=16*Math.pow(Math.sin(t),3),y=13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);pts.push([x*R/19,-y*R/19])}line(pts,pal[0],2,.78);line(pts,pal[1],.8,.65);
-}else if(scene.kind===6){ // butterfly curve
- const pts=[];for(let i=0;i<=720;i++){const t=i/720*Math.PI*12+phase*.018;const r=Math.exp(Math.cos(t))-2*Math.cos(4*t)+Math.pow(Math.sin(t/12),5);pts.push([Math.sin(t)*r*R/4.5,Math.cos(t)*r*R/4.5])}line(pts,pal[0],1.2,.58);line(pts.map(([x,y])=>[-x,y]),pal[1],.8,.4);
-}else if(scene.kind===7){ // hypotrochoid spirograph
- const p=3+scene.arms%5,q=5+scene.arms%4,d=.58;for(let j=0;j<4;j++){const pts=[];for(let i=0;i<=720;i++){const t=i/720*Math.PI*2*q;const x=R*((1-d)*Math.cos(t)+d*Math.cos((1-d)/d*t+j*.035+phase*.025)),y=R*((1-d)*Math.sin(t)-d*Math.sin((1-d)/d*t+j*.035+phase*.025));pts.push([x,y])}line(pts,pal[j%3],1.1,.48)}
-}else{ // lemniscate / infinity curve
- for(let j=0;j<5;j++){const pts=[];for(let i=0;i<=540;i++){const t=i/540*Math.PI*2+phase*.025+j*.018,den=1+Math.sin(t)*Math.sin(t),x=R*.95*Math.cos(t)/den,y=R*.95*Math.sin(t)*Math.cos(t)/den;pts.push([x,y])}line(pts,pal[j%3],1.1,.5)}
-}
-ctx.restore();
-}
-function frame(){const w=canvas.clientWidth,h=canvas.clientHeight,cx=w/2,cy=h/2;ctx.clearRect(0,0,w,h);
-// ambient stars with deterministic positions per scene
-let seed=scene.seed;const rand=()=>{seed=(seed*9301+49297)%233280;return seed/233280};for(let i=0;i<130;i++){const x=rand()*w,y=rand()*h,r=.45+rand()*1.2,a=.15+rand()*.42;ctx.beginPath();ctx.arc(x,y,r*(.8+.2*Math.sin(phase+i)),0,Math.PI*2);ctx.fillStyle=palette[i%3];ctx.globalAlpha=a;ctx.fill()}ctx.globalAlpha=1;
-// diffuse central bloom
-const bloom=ctx.createRadialGradient(cx,cy,4,cx,cy,Math.min(w,h)*.4);bloom.addColorStop(0,'rgba(119,183,239,.22)');bloom.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=bloom;ctx.fillRect(0,0,w,h);
-drawArt(w,h,cx,cy);
-// Multiple small moons follow independent elliptical orbits around the blue planet.
-for(const moon of scene.moons){const orbit=Math.min(w,h)*moon.r,angle=phase*moon.speed+moon.offset,x=Math.cos(angle)*orbit,y=Math.sin(angle)*orbit*moon.flat,rot=moon.tilt;const ox=x*Math.cos(rot)-y*Math.sin(rot),oy=x*Math.sin(rot)+y*Math.cos(rot);ctx.beginPath();ctx.ellipse(cx,cy,orbit,orbit*moon.flat,rot,0,Math.PI*2);ctx.strokeStyle='rgba(67,127,188,.17)';ctx.lineWidth=.8;ctx.stroke();const mx=cx+ox,my=cy+oy,rad=moon.size;const mg=ctx.createRadialGradient(mx-rad*.35,my-rad*.4,1,mx,my,rad*2.6);mg.addColorStop(0,'#fff');mg.addColorStop(.35,palette[moon.color]);mg.addColorStop(1,'rgba(90,150,205,0)');ctx.fillStyle=mg;ctx.beginPath();ctx.arc(mx,my,rad*2.6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(mx,my,rad,0,Math.PI*2);ctx.fill();}
-if(burstPower>.03){for(let i=0;i<38;i++){const a=i*Math.PI*2/38+scene.seed,r=(1.35-burstPower)*Math.min(w,h)*.38;ctx.beginPath();ctx.arc(cx+Math.cos(a)*r,cy+Math.sin(a)*r,1+burstPower*.65,0,Math.PI*2);ctx.fillStyle=palette[i%3];ctx.globalAlpha=.8;ctx.fill()}ctx.globalAlpha=1}
-if(!reduce.matches){phase+=.012;burstPower*=.955;raf=requestAnimationFrame(frame)}}
-function restart(){cancelAnimationFrame(raf);resize();frame()}new ResizeObserver(restart).observe(canvas);restart();
-document.getElementById('planet').addEventListener('click',()=>{newScene();burst();restart();document.getElementById('hint').innerHTML='A new pattern, just for you <span>· tap again</span>';});
+document.getElementById('shuffle').addEventListener('click',makeCopy);
 </script><script src="./weather-data.js"></script>
 <script src="./weather.js"></script>
 <script src="./longing.js"></script>
 <script src="./amap-config.js"></script>
 <script src="./restaurants.js"></script>
+<script src="./holiday-config.js"></script>
+<script src="./holidays.js"></script>
+<script src="./scenes.js"></script>
 <script src="./page-refresh.js"></script>
 </body>
 </html>
