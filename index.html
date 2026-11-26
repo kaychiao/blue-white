@@ -52,6 +52,9 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 
 .food-location-controls{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px}.food-location-form{display:flex;flex:1;gap:8px;min-width:240px}.food-location-form input{flex:1;min-width:0;min-height:44px;padding:10px 14px;border:1px solid #adc7e2;border-radius:12px;background:#f7faff;color:#294c72;font:14px -apple-system,BlinkMacSystemFont,sans-serif}.food-location-form input::placeholder{color:#526c87}.food-location-form input:focus-visible{outline:2px solid #286cb6;outline-offset:2px}.food-location-controls button{min-height:44px}.food-location-controls button:disabled{opacity:.45;cursor:wait}.food-location-options{display:grid;gap:8px;margin:14px 0}.place-option{text-align:left;padding:12px 16px;min-height:44px;border:1px solid #c8daed;border-radius:12px;background:#f7faff;color:#294c72;font:14px/1.6 -apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer}.place-option:hover{background:#e5effb}.place-option:focus-visible{outline:2px solid #286cb6;outline-offset:2px}.visually-hidden{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media(max-width:480px){.food-location-form{flex-basis:100%;min-width:0}.food-location-form .shuffle{padding:10px 14px}}
+
+.refresh-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.refresh-label{font-size:12px;color:#4c6584}.refresh-select{min-height:44px;border:1px solid #c4d7eb;border-radius:12px;background:#f7faff;color:#315f91;padding:8px;font:13px -apple-system,BlinkMacSystemFont,sans-serif}.refresh-select:focus-visible{outline:2px solid #286cb6;outline-offset:3px}.bottom{flex-wrap:wrap;gap:20px}
+@media(max-width:760px){.refresh-controls{width:100%}.refresh-controls .shuffle{margin-left:auto}}
 </style>
 </head>
 <body>
@@ -106,7 +109,7 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
   <div class="restaurant-grid" id="restaurantList"></div>
   <p class="food-notice">评分、人均和营业时间以高德返回为准；暂无评分的店不会标为高分。出发前请到地图确认。</p>
 </details>
-<footer class="bottom"><div class="thought"><b>A LITTLE THOUGHT</b><span id="thought">宇宙不一定有答案，但总有一颗星会按时出现。</span></div><button class="shuffle" id="shuffle" type="button">换一段心情 ↗</button></footer>
+<footer class="bottom"><div class="thought"><b>A LITTLE THOUGHT</b><span id="thought">宇宙不一定有答案，但总有一颗星会按时出现。</span></div><div class="refresh-controls"><label class="refresh-label" for="refreshInterval">自动换一句</label><select id="refreshInterval" class="refresh-select"><option value="10">10 秒</option><option value="30">30 秒</option><option value="60">1 分钟</option><option value="0">暂停</option></select><button class="shuffle" id="shuffle" type="button">换一段心情 ↗</button></div></footer>
 <script src="./daily-copy.js"></script>
 <script src="./generated-copy.js"></script>
 <script>
@@ -189,5 +192,6 @@ document.getElementById('planet').addEventListener('click',()=>{newScene();burst
 <script src="./longing.js"></script>
 <script src="./amap-config.js"></script>
 <script src="./restaurants.js"></script>
+<script src="./page-refresh.js"></script>
 </body>
 </html>
