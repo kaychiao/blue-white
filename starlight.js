@@ -1,14 +1,48 @@
 // Four quiet points of light: the meaning stays between the people who know it.
 window.createStarSecret = ({button,label,getLabel,redraw,reducedMotion}) => {
   const duration=8200,holdDelay=1000;
+  const whispers=[
+    'You crossed my mind.',
+    'Thinking of you, quietly.',
+    'A little light, just for you.',
+    'Somewhere in my day, there you are.',
+    'My thoughts found their way to you.',
+    'Even the quiet reminds me of you.',
+    'A small thought. A warm feeling.',
+    'You make ordinary moments softer.',
+    'There you are, in my thoughts again.',
+    'I saved a little starlight for you.',
+    'A quiet hello, from me to you.',
+    "If thoughts could glow, you'd know.",
+    'One little moment, all about you.',
+    'You found your way into my day.',
+    'The stars can keep our little secret.',
+    'A little closer, even from here.',
+    'Some thoughts arrive with your name.',
+    'This little light reminds me of you.',
+    'I like finding you in my thoughts.',
+    'No hurry. Just a thought of you.',
+    'A soft pause, and there you are.',
+    'I thought of you. The stars noticed.',
+    "In this quiet moment, it's you.",
+    "There's a little more light with you."
+  ];
+  const whisperKey='bw-star-whispers-v1';let remaining=[],lastWhisper='',currentWhisper='';
+  try{const saved=JSON.parse(sessionStorage.getItem(whisperKey)||'null');if(saved&&Array.isArray(saved.remaining)){remaining=[...new Set(saved.remaining.filter(line=>whispers.includes(line)))];lastWhisper=whispers.includes(saved.last)?saved.last:''}}catch{}
+  function pickWhisper(){
+    if(!remaining.length){remaining=[...whispers];for(let i=remaining.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[remaining[i],remaining[j]]=[remaining[j],remaining[i]]}}
+    if(remaining[remaining.length-1]===lastWhisper&&remaining.length>1)[remaining[0],remaining[remaining.length-1]]=[remaining[remaining.length-1],remaining[0]];
+    lastWhisper=remaining.pop();try{sessionStorage.setItem(whisperKey,JSON.stringify({last:lastWhisper,remaining}))}catch{}
+    return lastWhisper;
+  }
   let active=false,started=0,endTimer=null,holdTimer=null,origin=null,consumed=false,lastMinute='';
   const anchors=[[.22,.32],[.7,.22],[.8,.66],[.31,.77]];
   const clock=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
-  function syncLabel(){label.textContent=active?'You crossed my mind.':getLabel()}
+  function syncLabel(){label.textContent=active?currentWhisper:getLabel()}
   function finish(){active=false;clearTimeout(endTimer);endTimer=null;syncLabel();if(!document.hidden)redraw()}
   function reveal(){
     if(document.hidden||active)return false;
-    active=true;started=Date.now();syncLabel();clearTimeout(endTimer);endTimer=setTimeout(finish,duration);redraw();return true;
+    active=true;currentWhisper=pickWhisper();started=Date.now();syncLabel();clearTimeout(endTimer);endTimer=setTimeout(finish,duration);redraw();return true;
   }
   function checkClock(){
     if(document.hidden)return;
@@ -43,6 +77,14 @@ window.createStarSecret = ({button,label,getLabel,redraw,reducedMotion}) => {
       const x=((ax+drift)*(1-alignment)+(.32+i*.12)*alignment)*w;
       const y=((ay+drift)*(1-alignment)+.5*alignment)*h;
       const beat=active?(reducedMotion()?1:Math.exp(-(((elapsed-(1.5+i*.8))/.32)**2))):0;
+      // A vertical trace for each star: four quiet strokes, never literal digits.
+      if(alignment>0){
+        const length=Math.min(w,h)*.17*alignment;
+        const trace=ctx.createLinearGradient(x,y-length/2,x,y+length/2);
+        trace.addColorStop(0,'rgba(87,142,196,0)');trace.addColorStop(.18,'#7aabd5');trace.addColorStop(.5,'#4e88be');trace.addColorStop(.82,'#7aabd5');trace.addColorStop(1,'rgba(87,142,196,0)');
+        ctx.globalAlpha=alignment*(.6+beat*.4);ctx.strokeStyle=trace;ctx.lineWidth=2+beat;ctx.lineCap='round';ctx.shadowColor='#8fc9f6';ctx.shadowBlur=8+beat*10;
+        ctx.beginPath();ctx.moveTo(x,y-length/2);ctx.lineTo(x,y+length/2);ctx.stroke();
+      }
       const radius=1.7+beat*1.8;
       ctx.globalAlpha=.7+beat*.3;ctx.fillStyle='#578ec4';ctx.shadowColor='#79b9f3';ctx.shadowBlur=5+beat*16;
       ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill();
