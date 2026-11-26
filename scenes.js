@@ -9,7 +9,7 @@
  const englishNames={stars:'Binary Stars',mobius:'Möbius Ribbon',trefoil:'Trefoil Knot',heart:'Heart Surface',lissajous:'Lissajous Resonance',rose:'Rose Curves',garden:'Golden-angle Garden',butterfly:'Butterfly Curve',lorenz:'Lorenz Attractor',sea:'Moonlit Waves',klein:'Klein Bottle',surfaces:'When Surfaces Meet',tree:'A Fractal Christmas',lantern:'Lantern of Light',year:'A New Chapter',bridge:'A Bridge of Stars',moon:'Mid-autumn Moon'};
 
  function theme(){return window.Holiday?.active.id||'daily'}
- function palette(){return ['spring','lantern','newyear','moon'].includes(theme())?['#477cb0','#a88845','#81acd3']:theme()==='qixi'?['#6578ae','#a089b9','#7cb6d2']:['#397bb8','#74abd6','#a9cce9']}
+ function palette(){if(window.TimeTheme?.current)return window.TimeTheme.current.drawing;return ['spring','lantern','newyear','moon'].includes(theme())?['#477cb0','#a88845','#81acd3']:theme()==='qixi'?['#6578ae','#a089b9','#7cb6d2']:['#397bb8','#74abd6','#a9cce9']}
  function project(p,w,h){let [x,y,z=0]=p;const angle=ry+t*.08,xx=x*Math.cos(angle)+z*Math.sin(angle),zz=-x*Math.sin(angle)+z*Math.cos(angle),yy=y*Math.cos(rx)-zz*Math.sin(rx),depth=y*Math.sin(rx)+zz*Math.cos(rx),s=Math.min(w,h)*.36*(1+Math.sin(t*.6)*.014);return[w/2+xx*s,h/2-yy*s,depth]}
  function path(points,color,w,h,alpha=.6,width=1){ctx.beginPath();points.forEach((p,i)=>{const a=project(p,w,h);i?ctx.lineTo(a[0],a[1]):ctx.moveTo(a[0],a[1])});ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();ctx.globalAlpha=1}
  function dot(p,r,color,w,h){const [x,y,z]=project(p,w,h);ctx.shadowBlur=10;ctx.shadowColor=color;ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r*(1+z*.1),0,TAU);ctx.fill();ctx.shadowBlur=0}
@@ -57,7 +57,7 @@
   if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
   if(!motion.matches&&last)t+=Math.min(.05,(now-last)/1000);last=now;
   const pal=palette();for(const [x,y,r,phase]of stars){ctx.globalAlpha=.2+Math.sin(t*.5+phase)*.12;ctx.fillStyle=pal[0];ctx.beginPath();ctx.arc(x*w,y*h,r,0,TAU);ctx.fill()}ctx.globalAlpha=1;
-  const glow=ctx.createRadialGradient(w/2,h/2,5,w/2,h/2,Math.min(w,h)*.45);glow.addColorStop(0,'rgba(133,186,233,.17)');glow.addColorStop(1,'rgba(133,186,233,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);draw(w,h);
+  const glow=ctx.createRadialGradient(w/2,h/2,5,w/2,h/2,Math.min(w,h)*.45);glow.addColorStop(0,window.TimeTheme?.current.bloom||'rgba(133,186,233,.17)');glow.addColorStop(1,'rgba(133,186,233,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);draw(w,h);
   // Seasonal decoration is local to the artwork; never covers the letter.
   if(theme()==='christmas')for(let i=0;i<35;i++){const x=(stars[i][0]*w+t*3)%w,y=(stars[i][1]*h+t*(6+i%4))%h;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,1+i%2,0,TAU);ctx.fill()}
   if(pulse>0){for(let i=0;i<30;i++){const a=i/30*TAU,r=(1-pulse)*Math.min(w,h)*.48;ctx.globalAlpha=pulse;ctx.fillStyle=pal[i%3];ctx.beginPath();ctx.arc(w/2+Math.cos(a)*r,h/2+Math.sin(a)*r,1.7,0,TAU);ctx.fill()}ctx.globalAlpha=1;pulse=motion.matches?0:Math.max(0,pulse-.025)}
@@ -94,7 +94,7 @@
  button.addEventListener('pointercancel',()=>{drag=null;moved=true});
  button.addEventListener('lostpointercapture',()=>{drag=null});
  button.addEventListener('click',e=>{if(secret?.consumeClick()){moved=false;return}if(moved&&e.detail!==0){moved=false;return}moved=false;next()});
- document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(raf);if(!document.hidden)redraw()});motion.addEventListener('change',redraw);new ResizeObserver(redraw).observe(canvas);
+ document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(raf);if(!document.hidden)redraw()});motion.addEventListener('change',redraw);document.addEventListener('skychange',redraw);new ResizeObserver(redraw).observe(canvas);
  document.addEventListener('holidaychange',event=>{if(event.detail.changed){deck=[];choose(event.detail.scene||scenes[Math.floor(Math.random()*scenes.length)][0])}});
  secret=window.createStarSecret?.({button,label:document.getElementById('orbitLabel'),getLabel:()=>englishNames[id]||'A little universe',redraw,reducedMotion:()=>motion.matches});
  window.MathScenes={choose,next,catalog};choose(window.Holiday?.templates[theme()]?.scene||scenes[Math.floor(Math.random()*scenes.length)][0]);secret?.checkClock();

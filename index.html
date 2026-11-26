@@ -64,8 +64,10 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 /* Keep the letter rhythm stable across complete AI sentences of different lengths. */
 .title{min-height:2.44em}.title-line{min-height:1.22em}.poem{min-height:4.2em;line-height:1.85}.personal{min-height:1.75em}
 </style>
+<link rel="stylesheet" href="./time-theme.css">
 </head>
 <body>
+<script src="./time-theme.js"></script>
 <header class="top"><div class="brand"><i></i><span>BLUE &amp; WHITE</span><span id="holidayBadge" class="holiday-badge" hidden></span></div>
   <div class="clock-widget"><div class="clock-copy"><span class="date" id="date"></span><time class="live-time" id="liveTime" aria-label="上海时间">--:--:--</time></div><div class="clock-face" aria-hidden="true"><i class="hand hour-hand" id="hourHand"></i><i class="hand minute-hand" id="minuteHand"></i><i class="hand second-hand" id="secondHand"></i></div></div>
 </header>
@@ -90,6 +92,31 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
     <div class="orbit-label" id="orbitLabel" aria-live="polite">Möbius Ribbon</div>
     <div class="scene-hint" id="hint">Tap for another little universe · drag to turn</div>
   </section>
+<figure class="bund-view" aria-label="外滩与浦东天际线的素描"><div class="bund-drawing" aria-hidden="true"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 430" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">
+<!-- An imagined pencil study: Bund facades facing the Pudong skyline. -->
+<g opacity=".8">
+<path d="M0 303 Q380 294 800 305 T1600 302 M0 308 Q420 300 800 309 T1600 306"/>
+<path d="M35 301V240H146V301M29 240H152L142 232H43Z M51 251V288M68 251V288M85 251V288M102 251V288M119 251V288M40 292H141"/>
+<!-- HSBC-inspired dome and colonnade -->
+<path d="M171 302V237H317V302M162 237H325L302 224H185Z M212 224V209Q244 158 276 209V224M209 211H278M239 186V174H249V186M244 174V164 M190 249V290M208 249V290M226 249V290M244 249V290M262 249V290M280 249V290M298 249V290M183 248H305M182 294H307"/>
+<!-- Customs House clock tower -->
+<path d="M341 302V232H387V178H395V145H433V178H441V232H482V302 M389 231H440M393 178H436M401 145V132L414 118 427 132V145M414 118V101 M396 194H433V226H396Z M414 202V211L422 215 M355 246V289M373 246V289M395 246V289M415 246V289M436 246V289M456 246V289M472 246V289M348 293H476"/>
+<circle cx="414" cy="211" r="12"/>
+<!-- Peace Hotel roof and neighboring blocks -->
+<path d="M509 301V229H541V196H559L583 149 607 196H627V229H655V301M559 196H607M583 149V136M547 207H620M518 239H647M521 248V291M538 248V291M555 248V291M572 248V291M589 248V291M606 248V291M623 248V291M641 248V291 M680 302V250H755V302M675 250H761L747 240H692Z M693 262V289M711 262V289M729 262V289M747 262V289"/>
+<!-- Across the river, the Pearl Tower and distant towers -->
+<path d="M975 302 1017 235M1059 302 1017 235M1001 301 1017 245 1033 301 M1014 220V135M1020 220V135M1017 110V74M1017 74V60M1007 253H1027"/>
+<circle cx="1017" cy="231" r="24"/><circle cx="1017" cy="124" r="13"/>
+<path d="M996 224Q1017 215 1038 224M994 234Q1017 242 1040 234M1006 121H1028"/>
+<path d="M1098 302V220H1135V302M1094 221H1139M1102 232H1131M1102 243H1131M1102 254H1131M1102 265H1131M1102 276H1131 M1166 301V192H1176V175H1185V158H1200V175H1209V192H1219V301M1173 205H1212M1173 218H1212M1173 231H1212M1173 244H1212M1173 257H1212M1173 270H1212M1173 283H1212"/>
+<path d="M1251 302V135H1303V302M1251 135 1276 103 1303 135M1263 135 1275 119 1292 135Z M1258 151H1296M1258 164H1296M1258 177H1296M1258 190H1296M1258 203H1296M1258 216H1296M1258 229H1296M1258 242H1296M1258 255H1296M1258 268H1296M1258 281H1296"/>
+<path d="M1340 302Q1331 218 1340 156Q1348 85 1388 59Q1410 137 1406 216L1400 302M1340 156 1394 100M1337 202 1403 145M1337 248 1406 195M1340 286 1402 243M1357 302Q1377 211 1370 141"/>
+<path d="M1433 302V242H1470V302M1485 301V221H1536V302M1548 302V259H1599"/>
+</g>
+<!-- Broken pencil marks and river reflections. -->
+<g opacity=".38" stroke-width=".7"><path d="M44 307 47 319M184 307 190 328M244 312 242 337M409 309 415 348M579 310 585 336M1008 311 1017 356M1190 309 1195 334M1276 313 1271 341M1373 309 1369 359M221 347h48m131 17h31m548-3h57m221-8h48M70 370h190m230 10h150m220-8h137m160 20h225M15 400q270-10 490 0m240-6q220-9 440 0"/><path d="m196 255 8-7m10 19 8-7m226-8 8-7m-50 45 6-8m814-74 8-8m7 19 8-9m72-49 12-11m-12 52 13-11M164 240l158 1M390 178l48 1M540 208l80 1"/></g>
+</svg>
+</div><figcaption>SHANGHAI <span>·</span> THE BUND</figcaption></figure>
 <details class="weather-panel weather-disclosure" id="weatherPanel" aria-label="上海市天气" aria-busy="true">
   <summary class="weather-summary">
     <span class="weather-summary-main"><span class="weather-location">上海</span><span class="weather-temp" id="temperature">—</span><span class="weather-description" id="conditions">天气加载中</span></span>
@@ -105,6 +132,7 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 </details>
   </div>
 </main>
+
 <details class="food-section" id="food">
   <summary class="food-summary"><span><span class="food-title">Fred，今天吃什么？</span><span class="food-subtitle">川菜优先 · 找找附近的好味道</span></span><span class="food-chevron" aria-hidden="true">⌄</span></summary>
   <div class="food-location-controls"><button class="shuffle" id="restaurantLocate" type="button">用我的位置 ↗</button><form id="restaurantForm" class="food-location-form"><label for="restaurantAddress" class="visually-hidden">输入城市、商圈、地铁站或地址</label><input id="restaurantAddress" type="search" maxlength="100" placeholder="输入城市、商圈或地铁站" autocomplete="off"><button class="shuffle" id="restaurantSearch" type="submit">查找地点</button></form></div>
@@ -161,6 +189,7 @@ document.getElementById('shuffle').addEventListener('click',makeCopy);
 <script src="./holiday-config.js"></script>
 <script src="./holidays.js"></script>
 <script src="./starlight.js"></script>
+<script src="./sky-atmosphere.js"></script>
 <script src="./scenes.js"></script>
 <script src="./page-refresh.js"></script>
 </body>
