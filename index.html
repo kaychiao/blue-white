@@ -123,7 +123,7 @@ function makeCopy(){
  if(window.Holiday && window.Holiday.active.id!=='daily'){window.Holiday.applyCopy();return;}
  const dateKey=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const batch=window.aiCopy;
- if(batch?.validUntil>=dateKey && batch.notes?.length){
+ if(batch?.policyVersion===2 && batch.validUntil>=dateKey && batch.notes?.length){
    let history=[];try{history=JSON.parse(localStorage.getItem('bw-ai-history')||'[]')}catch{}
    const candidates=batch.notes.filter(n=>!history.includes(n.first+n.second+n.accent));
    const note=pick(candidates.length?candidates:batch.notes);

@@ -27,9 +27,14 @@ test('Every scene renders finite geometry and can respond in reduced motion',()=
  for(const [id]of window.MathScenes.catalog){window.MathScenes.choose(id);handlers['artwork-click'][0]({detail:1});}
  for(let i=0;i<30;i++)window.MathScenes.next();
 });
-test('10-second refresh changes copy only, pauses hidden and refreshes on return',()=>{
- let timer,changes=0,hidden=false;const listeners={};const c={makeCopy(){changes++},clearTimeout(){timer=null},setTimeout(fn,delay){assert.equal(delay,10000);timer=fn},document:{get hidden(){return hidden},addEventListener(e,f){listeners[e]=f}},window:{addEventListener(){}}};
- vm.runInNewContext(fs.readFileSync('page-refresh.js','utf8'),c);timer();assert.equal(changes,1);hidden=true;listeners.visibilitychange();assert.equal(timer,null);hidden=false;listeners.visibilitychange();assert.equal(changes,2);
+test('520-second refresh waits until due on return and resets after manual changes',()=>{
+ let timer,delay,now=0,changes=0,hidden=false;const listeners={},windowEvents={};let manual;
+ const c={Date:{now:()=>now},makeCopy(){changes++},clearTimeout(){timer=null},setTimeout(fn,ms){delay=ms;timer=fn},document:{get hidden(){return hidden},getElementById(){return{addEventListener(e,f){manual=f}}},addEventListener(e,f){listeners[e]=f}},window:{addEventListener(e,f){windowEvents[e]=f}}};
+ vm.runInNewContext(fs.readFileSync('page-refresh.js','utf8'),c);assert.equal(delay,520000);
+ now=10000;hidden=true;listeners.visibilitychange();assert.equal(timer,null);now=20000;hidden=false;listeners.visibilitychange();assert.equal(changes,0);assert.equal(delay,500000);
+ now=520000;timer();assert.equal(changes,1);assert.equal(delay,520000);
+ now=600000;manual();assert.equal(delay,520000);now=610000;windowEvents.pageshow({persisted:true});assert.equal(changes,1);assert.equal(delay,510000);
+ hidden=true;listeners.visibilitychange();now=1200000;hidden=false;listeners.visibilitychange();assert.equal(changes,2);assert.equal(delay,520000);
 });
 
 test('Click cycles scenes without repeats; dragging rotates without switching; keyboard activation works',()=>{

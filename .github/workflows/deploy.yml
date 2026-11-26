@@ -25,6 +25,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify copy timing and content rules
+        run: node --test tests/season-scenes.test.cjs tests/copy-generation.test.mjs
       - name: Restore last valid AI batch
         uses: actions/cache/restore@v4
         with:
