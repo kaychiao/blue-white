@@ -29,7 +29,8 @@
     const index=12+87.9*Math.pow(progress,.85);
     document.getElementById('longingValue').textContent=until>Date.now()?'∞':index.toFixed(1);
     meter.style.setProperty('--heartbeat',`${(1.8-progress*.65).toFixed(2)}s`);
-    document.getElementById('longingNote').textContent=until>Date.now()?secretNote:h<6?'夜深了，想念也轻一点。':h<11?'才刚开始，就已经想起你。':h<17?'忙碌的间隙，也分一点给你。':h<22?'天色慢慢暗了，想你多一点。':'今天快结束了，想你还没有。';
+    const note=until>Date.now()?secretNote:h<6?'夜深了，想念也轻一点。':h<11?'才刚开始，就已经想起你。':h<17?'忙碌的间隙，也分一点给你。':h<22?'天色慢慢暗了，想你多一点。':'今天快结束了，想你还没有。';
+    const label=document.getElementById('longingNote');if(label.textContent!==note)label.textContent=note;
     if(schedule)setTimeout(tick,1000);
   }
   tick();
