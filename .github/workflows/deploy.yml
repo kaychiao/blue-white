@@ -71,7 +71,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir -p _site
-          cp index.html copy-title.js daily-copy.js generated-copy.js weather.js weather-data.js longing.js amap-config.js restaurants.js page-refresh.js holiday-config.js holidays.js starlight.js scenes.js time-theme.css time-theme.js sky-atmosphere.js bund-sketch.svg _site/
+          cp index.html copy-title.js daily-copy.js generated-copy.js weather.js weather-data.js longing-model.js longing.js amap-config.js restaurants.js page-refresh.js holiday-config.js holidays.js starlight.js scenes.js time-theme.css time-theme.js sky-atmosphere.js bund-sketch.svg _site/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

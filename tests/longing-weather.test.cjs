@@ -4,13 +4,13 @@ function page(file){
  function el(id){return elements[id]??=( {textContent:'',hidden:false,disabled:false,style:{setProperty(){}},classList:{values:new Set(),add(x){this.values.add(x)},remove(x){this.values.delete(x)}},handlers:{},addEventListener(e,fn){this.handlers[e]=fn},setAttribute(){},replaceChildren(){},append(){},remove(){}})}
  const document={hidden:false,getElementById:el,addEventListener(e,fn){events[e]=fn},createElement:()=>el('script'),head:{append(){}}};
  const c={document,window:{},Intl,Math,Number,URL,location:{protocol:'https:'},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},Date:class extends Date{constructor(...args){super(...(args.length?args:[now]))}static now(){return now}},setTimeout(fn,ms){const id=++serial;timers.set(id,{fn,at:now+ms});return id},clearTimeout:id=>timers.delete(id),setInterval(){}};
- return{c,el,document,events,storage,run(){vm.runInNewContext(fs.readFileSync(file,'utf8'),c)},advance(ms){now+=ms;for(const [id,t] of [...timers])if(t.at<=now){timers.delete(id);t.fn()}},set now(n){now=n},get now(){return now}};
+ return{c,el,document,events,storage,run(){if(file==='longing.js')vm.runInNewContext(fs.readFileSync('longing-model.js','utf8'),c);vm.runInNewContext(fs.readFileSync(file,'utf8'),c)},advance(ms){now+=ms;for(const [id,t] of [...timers])if(t.at<=now){timers.delete(id);t.fn()}},set now(n){now=n},get now(){return now}};
 }
 test('Love note temporarily reveals infinity, restores current time, supports Escape and visibility cancellation',()=>{
- const p=page('longing.js');p.run();const normal=p.el('longingValue').textContent,click=()=>p.el('longingSecret').handlers.click();
- click();assert.equal(p.el('longingValue').textContent,'∞');const first=p.el('longingNote').textContent;p.advance(1000);assert.equal(p.el('longingValue').textContent,'∞');p.advance(4200);assert.notEqual(p.el('longingValue').textContent,'∞');assert.equal(p.el('longingValue').textContent,normal);
+ const p=page('longing.js');p.run();const click=()=>p.el('longingSecret').handlers.click();
+ click();assert.equal(p.el('longingValue').textContent,'∞');const first=p.el('longingNote').textContent;p.advance(1000);assert.equal(p.el('longingValue').textContent,'∞');p.advance(4200);assert.notEqual(p.el('longingValue').textContent,'∞');assert(Number.isFinite(Number(p.el('longingValue').textContent)));
  click();assert.notEqual(p.el('longingNote').textContent,first);p.el('longingSecret').handlers.keydown({key:'Escape'});assert(!p.el('longing').classList.values.has('is-secret'));
- click();p.document.hidden=true;p.events.visibilitychange();assert.notEqual(p.el('longingValue').textContent,'∞');
+ click();p.document.hidden=true;p.events.visibilitychange();assert(!p.el('longing').classList.values.has('is-secret'));
 });
 function snapshot(now,age){return{source:'qweather',current:{time:(now-age)/1000,temperature_2m:10,apparent_temperature:9,relative_humidity_2m:89,weather_code:-1,condition_text:'雾',wind_speed_10m:2},hourly:{time:[Math.floor(now/3600000)*3600+3600],precipitation_probability:[70]}}}
 test('Delayed observations retain a visible timestamp without presenting old rain or clothing advice as current',()=>{
@@ -22,4 +22,10 @@ test('Recent observations keep forecast details; future and day-old observations
 });
 test('Publisher requires fresh API observations but permits a labeled cache no older than one day',async()=>{
  const {validWeather}=await import('../scripts/fetch-weather.mjs');const now=Date.now(),data=snapshot(now,4*3600000);assert.throws(()=>validWeather(data,now));assert.equal(validWeather(data,now,24*3600000),data);assert.throws(()=>validWeather(snapshot(now,25*3600000),now,24*3600000));
+});
+
+test('Returning after fifteen seconds adds a reunion note; brief switches do not replay it',()=>{
+ const p=page('longing.js');p.run();p.document.hidden=true;p.events.visibilitychange();p.advance(16000);p.document.hidden=false;p.events.visibilitychange();assert.match(p.el('longingNote').textContent,/你一回来/);
+ p.advance(25000);assert.doesNotMatch(p.el('longingNote').textContent,/你一回来/);
+ p.document.hidden=true;p.events.visibilitychange();p.advance(1000);p.document.hidden=false;p.events.visibilitychange();assert.doesNotMatch(p.el('longingNote').textContent,/你一回来/);
 });
