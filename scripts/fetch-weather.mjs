@@ -3,9 +3,9 @@ import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 const root=resolve(import.meta.dirname,'..');
 const cache=resolve(root,'.cache/weather.json');
-export function validWeather(data,now=Date.now()) {
+export function validWeather(data,now=Date.now(),maxAge=3*3600000) {
   const c=data?.current;
-  if(!c || !Number.isFinite(c.time) || c.time*1000>now+900000 || now-c.time*1000>3*3600000)throw Error('Missing or expired weather');
+  if(!c || !Number.isFinite(c.time) || c.time*1000>now+900000 || now-c.time*1000>maxAge)throw Error('Missing or expired weather');
   for(const field of ['temperature_2m','apparent_temperature','relative_humidity_2m','weather_code','wind_speed_10m'])if(!Number.isFinite(c[field]))throw Error(`Missing ${field}`);
   if(!Array.isArray(data.hourly?.time)||!Array.isArray(data.hourly?.precipitation_probability)||data.hourly.time.length!==data.hourly.precipitation_probability.length)throw Error('Missing hourly forecast');
   return data;
@@ -47,7 +47,7 @@ async function main(){
     catch{console.warn('::warning::Open-Meteo fetch failed.');}
   }
   if(snapshot){await mkdir(resolve(root,'.cache'),{recursive:true});await writeFile(cache+'.tmp',JSON.stringify(snapshot));await rename(cache+'.tmp',cache);}
-  else{try{snapshot=validWeather(JSON.parse(await readFile(cache,'utf8')));console.log('Using weather cache under 3 hours old.')}catch{console.warn('::warning::No valid weather snapshot available.')}}
+  else{try{snapshot=validWeather(JSON.parse(await readFile(cache,'utf8')),Date.now(),24*3600000);console.log('Using weather cache under 24 hours old; the page labels older observations.')}catch{console.warn('::warning::No valid weather snapshot available.')}}
   await writeFile(resolve(root,'weather-data.js'),`// Public Shanghai weather snapshot.\nwindow.shanghaiWeather = ${JSON.stringify(snapshot).replaceAll('<','\\u003c')};\n`);
 }
 if(process.argv[1] && import.meta.url===pathToFileURL(resolve(process.argv[1])).href)await main();

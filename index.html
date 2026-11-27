@@ -63,6 +63,16 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 @media(max-width:760px){.scene{height:390px;min-height:390px}.brand{flex-wrap:wrap;max-width:58%}.orbit-label{max-width:none;line-height:1.5}.holiday-badge{font-size:10px}}
 /* Keep the letter rhythm stable across complete AI sentences of different lengths. */
 .title{min-height:2.44em}.title-line{min-height:1.22em}.poem{min-height:4.2em;line-height:1.85}.personal{min-height:1.75em}
+
+.longing-secret{appearance:none;display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;margin:-11px -6px;border:0;border-radius:50%;padding:0;background:transparent;color:inherit;cursor:pointer;touch-action:manipulation}
+.longing-secret:hover{background:color-mix(in srgb,currentColor,transparent 94%)}
+.longing-secret:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.longing.is-secret .longing-number{font-size:22px;line-height:1;vertical-align:-1px}
+.longing.is-secret .longing-percent{visibility:hidden}
+.longing.is-secret .longing-heart{animation:secretHeartbeat 900ms ease-in-out 2}
+@keyframes secretHeartbeat{0%,100%{transform:scale(1)}30%{transform:scale(1.18)}60%{transform:scale(1.04)}}
+#weatherFreshness{font-size:10px;font-weight:400;color:inherit}
+@media(prefers-reduced-motion:reduce){.longing.is-secret .longing-heart{animation:none}}
 </style>
 <link rel="stylesheet" href="./time-theme.css">
 </head>
@@ -79,9 +89,9 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
     <p class="poem" id="poem">不是要打断你的一天，只是想把一小段安静的蓝色，放到你路过的地方。<br>忙的时候认真忙，累的时候就停一会儿。</p>
     <p class="personal" id="personal">愿今天的地铁不太挤，<b>咖啡刚好合口。</b></p>
     <div class="longing" id="longing" aria-label="随上海时间增长的想你指数">
-      <svg class="longing-heart" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20S3 14.5 3 8.5C3 3.8 9 2.5 12 7c3-4.5 9-3.2 9 1.5C21 14.5 12 20 12 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 12h3l2-4 3 8 2-4h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="longing-reading">想你指数 <span class="longing-number" id="longingValue">12.0</span><span class="longing-percent">%</span></span>
-      <span class="longing-note" id="longingNote">才刚开始，就已经想起你。</span>
+      <button class="longing-secret" id="longingSecret" type="button" aria-label="轻触，收下一点想念" title="轻触，收下一点想念"><svg class="longing-heart" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20S3 14.5 3 8.5C3 3.8 9 2.5 12 7c3-4.5 9-3.2 9 1.5C21 14.5 12 20 12 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 12h3l2-4 3 8 2-4h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button><span class="longing-reading">想你指数 <span class="longing-number" id="longingValue">12.0</span><span class="longing-percent">%</span></span>
+      <span class="longing-note" id="longingNote" role="status">才刚开始，就已经想起你。</span>
     </div>
     <div class="divider"></div>
     <div class="code-note"><em id="code">const littleWish = () =&gt; “今天顺顺利利”;</em><br>// 不用回复，收下这点小小的好运就好。</div>
@@ -119,7 +129,7 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 </div><figcaption>SHANGHAI <span>·</span> THE BUND</figcaption></figure>
 <details class="weather-panel weather-disclosure" id="weatherPanel" aria-label="上海市天气" aria-busy="true">
   <summary class="weather-summary">
-    <span class="weather-summary-main"><span class="weather-location">上海</span><span class="weather-temp" id="temperature">—</span><span class="weather-description" id="conditions">天气加载中</span></span>
+    <span class="weather-summary-main"><span class="weather-location">上海</span><span class="weather-temp" id="temperature">—</span><span class="weather-description" id="conditions">天气加载中</span><small id="weatherFreshness" hidden></small></span>
     <span class="weather-summary-stats"><span>湿度 <b id="humidityCompact">—</b></span><span title="未来 3 小时最高降水概率">3h 降水 <b id="rainCompact">—</b></span></span>
     <span class="weather-chevron" aria-hidden="true">⌄</span>
   </summary>

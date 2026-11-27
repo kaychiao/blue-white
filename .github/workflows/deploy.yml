@@ -5,7 +5,7 @@ on:
     branches: ["main"]
   schedule:
     - cron: "17 23 * * *" # 北京时间约 07:17，GitHub 定时任务可能延迟
-    - cron: "37 * * * *" # 每小时更新天气，不调用 Gemini
+    - cron: "7,37 * * * *" # 每半小时尝试更新天气，GitHub 可能延迟；不调用 Gemini
   workflow_dispatch:
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: '22'
       - name: Verify copy timing and content rules
-        run: node --test tests/season-scenes.test.cjs tests/copy-generation.test.mjs tests/starlight.test.cjs
+        run: node --test tests/*.test.*
       - name: Restore last valid AI batch
         uses: actions/cache/restore@v4
         with:
@@ -35,7 +35,7 @@ jobs:
           restore-keys: ai-copy-
       - name: Generate daily Gemini copy
         env:
-          GEMINI_API_KEY: ${{ github.event.schedule != '37 * * * *' && secrets.GEMINI_API_KEY || '' }}
+          GEMINI_API_KEY: ${{ (github.event_name != 'schedule' || github.event.schedule == '17 23 * * *') && secrets.GEMINI_API_KEY || '' }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
           FRED_PROFILE: ${{ secrets.FRED_PROFILE }}
           FRED_RECENT: ${{ secrets.FRED_RECENT }}
