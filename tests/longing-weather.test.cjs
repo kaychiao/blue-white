@@ -4,7 +4,7 @@ function page(file){
  function el(id){return elements[id]??=( {textContent:'',hidden:false,disabled:false,style:{setProperty(){}},classList:{values:new Set(),add(x){this.values.add(x)},remove(x){this.values.delete(x)}},handlers:{},addEventListener(e,fn){this.handlers[e]=fn},setAttribute(){},replaceChildren(){},append(){},remove(){}})}
  const document={hidden:false,getElementById:el,addEventListener(e,fn){events[e]=fn},createElement:()=>el('script'),head:{append(){}}};
  const c={document,window:{},Intl,Math,Number,URL,location:{protocol:'https:'},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},Date:class extends Date{constructor(...args){super(...(args.length?args:[now]))}static now(){return now}},setTimeout(fn,ms){const id=++serial;timers.set(id,{fn,at:now+ms});return id},clearTimeout:id=>timers.delete(id),setInterval(){}};
- return{c,el,document,events,storage,run(){if(file==='longing.js')vm.runInNewContext(fs.readFileSync('longing-model.js','utf8'),c);vm.runInNewContext(fs.readFileSync(file,'utf8'),c)},advance(ms){now+=ms;for(const [id,t] of [...timers])if(t.at<=now){timers.delete(id);t.fn()}},set now(n){now=n},get now(){return now}};
+ return{c,el,document,events,storage,run(){if(file==='longing.js')vm.runInNewContext(fs.readFileSync('assets/js/longing-model.js','utf8'),c);vm.runInNewContext(fs.readFileSync('assets/js/'+file,'utf8'),c)},advance(ms){now+=ms;for(const [id,t] of [...timers])if(t.at<=now){timers.delete(id);t.fn()}},set now(n){now=n},get now(){return now}};
 }
 test('Love note temporarily reveals infinity, restores current time, supports Escape and visibility cancellation',()=>{
  const p=page('longing.js');p.run();const click=()=>p.el('longingSecret').handlers.click();

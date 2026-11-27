@@ -6,10 +6,10 @@
 
 元旦、公历圣诞（含平安夜）按上海日期自动启用；春节（正月初一至初七）、元宵、七夕、中秋通过浏览器 Intl 中国农历判断，排除闰月。节日完全按日期自动切换，页面不提供手动主题选择。节日模式采用成套短笺，覆盖普通工作日文案，避免混搭。粒子开场不随每次文案切换重播。
 
-生日、纪念日由 `holiday-config.js` 的 specialDates 配置：month、day 为公历数字，label 为显示名称，kind 为 birthday 或 anniversary。默认不设置，也不推测。配置优先于一般节日。
+生日、纪念日由 `data/holiday-config.js` 的 specialDates 配置：month、day 为公历数字，label 为显示名称，kind 为 birthday 或 anniversary。默认不设置，也不推测。配置优先于一般节日。
 
 没有加载外部图形库。Canvas 通过曲线采样和简易三维投影绘制，属于艺术化呈现，不是工程建模软件。减少动态效果模式下保留静态图形和手动交互。
 
 检查：`node --test tests/season-scenes.test.cjs`。
 
-四颗星的隐藏约定（长按与上海时间 11:11/23:11）见 [README](README.md#四颗星不用写出来的我在想你)，与 520 秒换句彼此独立。
+四颗星的隐藏约定（长按与上海时间 11:11/23:11）见 [README](../README.md#四颗星不用写出来的我在想你)，与 520 秒换句彼此独立。

@@ -1,12 +1,14 @@
 const test=require('node:test'),assert=require('node:assert/strict');
-const {sample}=require('../longing-model.js');
+const {sample}=require('../assets/js/longing-model.js');
 const at=time=>Date.parse(`2026-11-27T${time}+08:00`);
 test('Daily curve is nonlinear and continuous through Shanghai midnight',()=>{
+ assert(sample(at('09:00:00')).base>=80);
+ assert(sample(at('06:00:00')).base>=70);
  assert(sample(at('20:00:00')).base>sample(at('12:00:00')).base);
  assert(sample(at('06:00:00')).base<sample(at('03:00:00')).base);
  const morning=sample(at('10:00:00')).base-sample(at('09:00:00')).base;
  const evening=sample(at('18:00:00')).base-sample(at('17:00:00')).base;
- assert(Math.abs(morning-evening)>1);
+ assert(Math.abs(morning-evening)>.2);
  const midnight=at('00:00:00');assert(Math.abs(sample(midnight).value-sample(midnight-1).value)<.001);
 });
 test('A whole day stays finite and bounded, while breathing and spontaneous heart flutters vary',()=>{

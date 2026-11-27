@@ -38,7 +38,7 @@ async function main(){
   if(process.env.GITHUB_STEP_SUMMARY)await appendFile(process.env.GITHUB_STEP_SUMMARY,'## 高德餐厅接口实测\n固定测试位置：上海市中心，半径 3 公里。不是访客定位推荐。\n'+rows.join('\n'));
   if(process.env.AMAP_PUBLISH==='1'){
    const data={generatedAt:new Date().toISOString(),center:{name:'上海市中心固定测试点',location:'121.4737,31.2304',radius:3000},places:[...pool.values()]};
-   await writeFile(resolve('restaurant-data.js'),`// Public restaurant preview; contains no API credentials.\nwindow.restaurantData = ${JSON.stringify(data).replaceAll('<','\\u003c')};\n`);
+   await writeFile(new URL('../data/restaurant-data.js',import.meta.url),`// Public restaurant preview; contains no API credentials.\nwindow.restaurantData = ${JSON.stringify(data).replaceAll('<','\\u003c')};\n`);
   }
   console.log('AMap authentication and both nearby searches passed.');
  }catch(error){const safe=/^(HTTP \d+|AMap code [0-9A-Za-z_-]+|Invalid POI response|Connection [A-Z0-9_]+)$/.test(error.message)?error.message:'Connection timeout or response parsing failed';console.error(`::error::${safe}`);process.exitCode=1;}

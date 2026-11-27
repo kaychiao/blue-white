@@ -48,6 +48,6 @@ async function main(){
   }
   if(snapshot){await mkdir(resolve(root,'.cache'),{recursive:true});await writeFile(cache+'.tmp',JSON.stringify(snapshot));await rename(cache+'.tmp',cache);}
   else{try{snapshot=validWeather(JSON.parse(await readFile(cache,'utf8')),Date.now(),24*3600000);console.log('Using weather cache under 24 hours old; the page labels older observations.')}catch{console.warn('::warning::No valid weather snapshot available.')}}
-  await writeFile(resolve(root,'weather-data.js'),`// Public Shanghai weather snapshot.\nwindow.shanghaiWeather = ${JSON.stringify(snapshot).replaceAll('<','\\u003c')};\n`);
+  await writeFile(resolve(root,'data/weather-data.js'),`// Public Shanghai weather snapshot.\nwindow.shanghaiWeather = ${JSON.stringify(snapshot).replaceAll('<','\\u003c')};\n`);
 }
 if(process.argv[1] && import.meta.url===pathToFileURL(resolve(process.argv[1])).href)await main();

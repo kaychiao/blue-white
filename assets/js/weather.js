@@ -55,7 +55,7 @@
   function loadSnapshot() {
     return new Promise((resolve,reject)=>{
       const script=document.createElement('script');let finished=false;
-      script.src='./weather-data.js'+(location.protocol==='file:'?'':`?v=${Date.now()}`);
+      script.src='./data/weather-data.js'+(location.protocol==='file:'?'':`?v=${Date.now()}`);
       const timer=setTimeout(()=>done(new Error('Snapshot timeout')),10000);
       function done(error){if(finished)return;finished=true;clearTimeout(timer);script.remove();error?reject(error):resolve(window.shanghaiWeather)}
       script.onload=()=>done();script.onerror=()=>done(new Error('Snapshot unavailable'));

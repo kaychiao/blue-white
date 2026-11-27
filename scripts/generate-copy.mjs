@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 
 const root = resolve(import.meta.dirname, '..');
 const cache = resolve(root, '.cache/generated-copy.json');
-const output = resolve(root, 'generated-copy.js');
+const output = resolve(root, 'data/generated-copy.js');
 const readJSON = async file => JSON.parse(await readFile(file, 'utf8'));
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
 export const COPY_POLICY_VERSION = 3;

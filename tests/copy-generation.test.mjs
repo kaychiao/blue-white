@@ -18,7 +18,7 @@ test('Event occurrence date and reference expiry remain distinct; expired and fu
  assert.throws(()=>activeEvents({events:[{...old,expires:'2026-11-20'}]}));
 });
 test('Manual fallback does not turn past events into yesterday or last night',async()=>{
- const context={window:{}};vm.runInNewContext(await readFile(new URL('../daily-copy.js',import.meta.url),'utf8'),context);
+ const context={window:{}};vm.runInNewContext(await readFile(new URL('../data/daily-copy.js',import.meta.url),'utf8'),context);
  const strings=[];function collect(value){if(typeof value==='string')strings.push(value);else if(Array.isArray(value))value.forEach(collect);else if(value&&typeof value==='object')Object.values(value).forEach(collect)}collect(context.window.dailyCopy);
  assert(strings.length>100);for(const text of strings)assert(!/昨天|昨晚|前天|前两天|前几天/.test(text),text);
 });
@@ -31,7 +31,7 @@ test('Gemini repairs invalid content once and never retries HTTP failures',async
  calls=0;await assert.rejects(()=>generateValidatedCopy('test','test-model','not-a-real-key',async()=>{calls++;return{ok:true,json:async()=>({candidates:[{content:{parts:[{text:JSON.stringify(invalid)}]}}]})}}),/Invalid field/);assert.equal(calls,2);
 });
 test('Complete title is preserved verbatim through highlighting; fragments and editorial notes are rejected',async()=>{
- const context={window:{}};vm.runInNewContext(await readFile(new URL('../copy-title.js',import.meta.url),'utf8'),context);
+ const context={window:{}};vm.runInNewContext(await readFile(new URL('../assets/js/copy-title.js',import.meta.url),'utf8'),context);
  const note={title:'把一点蓝色留在这里，等你有空时路过。',accent:'有空时路过'};
  const parts=context.window.copyTitleParts(note);assert.equal(parts.first+parts.before+parts.accent+parts.after,note.title);assert.equal(parts.after,'。');
  assert.equal(context.window.copyTitleParts({...note,accent:'随意追加'}),null);

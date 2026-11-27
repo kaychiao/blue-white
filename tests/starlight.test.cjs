@@ -4,7 +4,7 @@ function setup(initial='2026-11-26T02:00:00Z',store=new Map(),reduced=false){
  const button={addEventListener(type,fn){(handlers[type]??=[]).push(fn)}};
  const document={hidden:false,addEventListener(type,fn){(events[type]??=[]).push(fn)}};
  const c={window:{addEventListener(){}},document,Intl,Math,Date:class extends Date{constructor(...args){super(...(args.length?args:[now]))}static now(){return now}},sessionStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)},setTimeout(fn,ms){const id=++serial;timers.set(id,{at:now+ms,fn});return id},clearTimeout:id=>timers.delete(id),setInterval(){}};
- vm.runInNewContext(fs.readFileSync('starlight.js','utf8'),c);
+ vm.runInNewContext(fs.readFileSync('assets/js/starlight.js','utf8'),c);
  const secret=c.window.createStarSecret({button,label,getLabel:()=>name,redraw(){},reducedMotion:()=>reduced});
  const emit=(type,event={})=>(handlers[type]||[]).forEach(fn=>fn(event));
  const advance=ms=>{now+=ms;for(const [id,t]of [...timers])if(t.at<=now){timers.delete(id);t.fn()}};

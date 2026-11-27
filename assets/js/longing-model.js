@@ -4,7 +4,7 @@
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const smooth=v=>{v=clamp(v,0,1);return v*v*(3-2*v)};
   // Matching endpoints keep Shanghai midnight continuous. Smooth joins let noon rest.
-  const knots=[[0,90],[3,52],[6,18],[9,30],[12,43],[15,49],[17,62],[20,80],[22,89],[24,90]];
+  const knots=[[0,91],[3,78],[6,72],[9,80],[12,84],[15,85],[17,88],[20,91],[22,92],[24,91]];
   function dayEvents(day){
     if(cache.has(day))return cache.get(day);
     let seed=(day^0x5201111)>>>0;
