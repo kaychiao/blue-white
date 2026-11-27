@@ -1,0 +1,21 @@
+/* Keep the reading together; the whisper uses the space it actually needs. */
+.longing{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;margin-top:22px;color:var(--sky-muted,#466c94);--heartbeat:1.8s;container-type:inline-size}
+.longing-summary{display:inline-flex;align-items:center;gap:10px;flex:none;min-height:24px}
+.longing-reading{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-size:12px;line-height:24px;letter-spacing:.01em}
+.longing-measure{display:inline-flex;align-items:baseline;gap:2px}
+.longing-number{display:inline-block;min-width:4ch;text-align:right;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;line-height:24px;color:var(--sky-accent,#286cb6)}
+.longing-percent{font-size:11px}
+.longing-note{min-width:0;max-width:100%;font-size:12px;line-height:1.7;overflow-wrap:anywhere;color:var(--sky-muted,#4c6584)}
+/* A 44px hit area around a quiet 22px symbol, without a permanent circular fill. */
+.longing-secret{appearance:none;display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;margin:-10px;border:0;border-radius:10px;padding:0;background:transparent;color:inherit;cursor:pointer;touch-action:manipulation}
+.longing-secret:hover{color:var(--sky-accent,#286cb6)}
+.longing-secret:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.longing-heart{width:22px;height:22px;flex:none;animation:littleHeartbeat var(--heartbeat) ease-in-out infinite;transform-origin:center}
+/* Infinity has its own optical size, but never inherits four digits of empty space. */
+.longing.is-secret .longing-number{min-width:0;font-size:22px;line-height:24px;text-align:start}
+.longing.is-secret .longing-percent{display:none}
+.longing.is-secret .longing-heart{animation:secretHeartbeat 900ms ease-in-out 2}
+@container(max-width:420px){.longing-note{flex-basis:100%;margin-inline-start:34px}}
+@keyframes littleHeartbeat{0%,38%,100%{transform:scale(1);opacity:.7}12%{transform:scale(1.13);opacity:1}24%{transform:scale(1.02)}30%{transform:scale(1.07)}}
+@keyframes secretHeartbeat{0%,100%{transform:scale(1)}30%{transform:scale(1.18)}60%{transform:scale(1.04)}}
+@media(prefers-reduced-motion:reduce){.longing-heart,.longing.is-secret .longing-heart{animation:none}}

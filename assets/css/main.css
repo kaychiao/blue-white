@@ -24,9 +24,6 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 .weather-disclosure[open]{width:min(320px,100%)}.weather-disclosure[open] .weather-summary{justify-content:flex-start;padding:0 4px}
 .weather-expanded{padding:12px 4px 4px;border-top:1px solid #c8daed}.weather-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 12px}.weather-metrics div{display:flex;flex-direction:column;gap:4px}.weather-metrics dt{font-size:11px}.weather-metrics dd{margin:0;color:#294c72;font-size:14px;font-variant-numeric:tabular-nums}.clothing-note{font-size:13px;line-height:1.7;margin:0;color:#385472}.weather-detail-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;margin-top:8px}.weather-refresh{border:0;background:transparent;color:#386b9e;min-width:44px;min-height:44px;font-size:20px;cursor:pointer;border-radius:50%}.weather-refresh:hover{background:#dfeafa}.weather-refresh:disabled{opacity:.4}.weather-foot{font-size:11px;line-height:1.6;display:flex;flex-direction:column;gap:4px}.weather-foot a{color:inherit;width:fit-content;text-underline-offset:3px}
 
-.longing{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin-top:22px;color:#466c94;--heartbeat:1.8s}.longing-heart{width:22px;height:22px;flex:none;animation:littleHeartbeat var(--heartbeat) ease-in-out infinite;transform-origin:center}.longing-reading{font-size:12px;letter-spacing:.02em}.longing-number{display:inline-block;min-width:4ch;margin-left:6px;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:#286cb6}.longing-percent{font-size:11px;margin-left:2px}.longing-note{font-size:12px;line-height:1.7;color:#4c6584}.longing-note:before{content:"·";margin-right:10px;color:#7295ba}@keyframes littleHeartbeat{0%,38%,100%{transform:scale(1);opacity:.7}12%{transform:scale(1.13);opacity:1}24%{transform:scale(1.02)}30%{transform:scale(1.07)}}
-@media(max-width:400px){.longing-note{flex-basis:100%;padding-left:32px}.longing-note:before{content:none}}
-@media(prefers-reduced-motion:reduce){.longing-heart{animation:none}}
 
 /* Small weather accessory: key readings stay visible at both sizes. */
 .weather-disclosure{width:min(320px,100%)}
@@ -56,12 +53,4 @@ main{min-height:calc(100svh - 155px);padding-top:12px;grid-template-columns:minm
 /* Keep the letter rhythm stable across complete AI sentences of different lengths. */
 .title{min-height:2.44em}.title-line{min-height:1.22em}.poem{min-height:4.2em;line-height:1.85}.personal{min-height:1.75em}
 
-.longing-secret{appearance:none;display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;margin:-11px -6px;border:0;border-radius:50%;padding:0;background:transparent;color:inherit;cursor:pointer;touch-action:manipulation}
-.longing-secret:hover{background:color-mix(in srgb,currentColor,transparent 94%)}
-.longing-secret:focus-visible{outline:2px solid currentColor;outline-offset:2px}
-.longing.is-secret .longing-number{font-size:22px;line-height:1;vertical-align:-1px}
-.longing.is-secret .longing-percent{visibility:hidden}
-.longing.is-secret .longing-heart{animation:secretHeartbeat 900ms ease-in-out 2}
-@keyframes secretHeartbeat{0%,100%{transform:scale(1)}30%{transform:scale(1.18)}60%{transform:scale(1.04)}}
 #weatherFreshness{font-size:10px;font-weight:400;color:inherit}
-@media(prefers-reduced-motion:reduce){.longing.is-secret .longing-heart{animation:none}}
