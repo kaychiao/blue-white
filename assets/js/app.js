@@ -23,9 +23,11 @@ function fitTitle(){
  const title=document.getElementById('title');
  title.style.fontSize='';
  const style=getComputedStyle(title),base=parseFloat(style.fontSize),available=title.clientWidth-4;
+ const first=title.querySelector('.title-line');
+ if(!first||getComputedStyle(first).display==='inline')return;
  const measure=document.createElement('canvas').getContext('2d');measure.font=`${style.fontWeight} ${base}px ${style.fontFamily}`;
  const widest=Math.max(...[...title.querySelectorAll('.title-line')].map(line=>measure.measureText(line.textContent).width));
- if(widest>available)title.style.fontSize=`${Math.max(24,base*available/widest)}px`;
+ if(widest>available)title.style.fontSize=`${Math.max(32,base*available/widest)}px`;
 }
 const titleObserver=new ResizeObserver(()=>fitTitle());titleObserver.observe(document.querySelector('.letter'));
 window.addEventListener('resize',fitTitle,{passive:true});

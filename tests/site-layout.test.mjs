@@ -10,10 +10,12 @@ test('Published site preserves all entry resources and dynamic weather loading w
   await buildSite(destination);
   assert.deepEqual((await readdir(destination)).sort(),['assets','data','index.html']);
   const html=await readFile(join(destination,'index.html'),'utf8');
-  const refs=[...html.matchAll(/(?:src|href)="(\.\/[^"?#]+)"/g)].map(m=>m[1]);
+  const refs=[...html.matchAll(/(?:src|href)="(\.\/[^"?#]+)(?:[?#][^"]*)?"/g)].map(m=>m[1]);
   assert(refs.length>=18);
+  assert.match(html,/assets\/css\/main\.css\?v=[a-f0-9]{12}/);
+  assert.match(html,/assets\/js\/app\.js\?v=[a-f0-9]{12}/);
   for(const ref of refs)await access(resolve(destination,ref));
-  assert(html.indexOf('longing-model.js')<html.indexOf('src="./assets/js/longing.js"'));
+  assert(html.indexOf('longing-model.js')<html.indexOf('src="./assets/js/longing.js'));
   const weather=await readFile(join(destination,'assets/js/weather.js'),'utf8');
   const snapshot=weather.match(/script\.src='([^']+)'/)[1];await access(resolve(destination,snapshot));
   assert(!html.includes('<style>'));assert(!html.includes('<script>'));

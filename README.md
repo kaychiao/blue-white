@@ -65,6 +65,7 @@ Fred 说过，**1111 是“我在想你”的意思**。页面用四颗星保存
 ## 内容与设置
 
 - [AI 文案配置](docs/AI-SETUP.md)：Gemini、私密背景与近况、生成审校规则。
+- [响应式布局说明](docs/LAYOUT.md)：电脑、平板、手机的断点与排版规则。
 - [图形与节日说明](docs/SCENES-AND-HOLIDAYS.md)：数学场景、节日日期及生日/纪念日配置。
 - `data/daily-copy.js`：AI 不可用时的人工备用素材。
 - `data/holiday-config.js`：自定义公历生日与纪念日，默认留空。

@@ -1,51 +1,25 @@
-/* Local time-of-day study. One letter, one visual column, one spacing system. */
+/* Time-of-day colors only. Responsive geometry belongs to main.css. */
 body[data-sky]{background:radial-gradient(ellipse at 82% 36%,var(--sky-b),transparent 48%),linear-gradient(130deg,var(--sky-a) 0%,var(--sky-surface) 100%);background-attachment:fixed}
 body[data-sky="sunset"]{background:radial-gradient(ellipse at 85% 40%,#f1e2dc,transparent 48%),linear-gradient(120deg,#fbf9f7,#f8f1ed 75%,#eee9f2)}
 body[data-sky]:before{opacity:.09;background-image:radial-gradient(var(--sky-line) .65px,transparent .65px);mask-image:linear-gradient(90deg,transparent 30%,#000);-webkit-mask-image:linear-gradient(90deg,transparent 30%,#000)}
-body[data-sky] .top{min-height:68px;padding-top:12px;padding-bottom:12px}
-body[data-sky] main{min-height:0;padding-top:18px;padding-bottom:26px;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:54px;align-items:start}
-body[data-sky] .letter{padding:18px 0 0;align-self:start}
-body[data-sky] .kicker{font:500 10px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:.16em;color:var(--sky-muted)}
-body[data-sky] .kicker:after{width:32px;background:var(--sky-line);opacity:.7}
-body[data-sky] .hello{font-size:14px;line-height:1.5;margin:20px 0 12px;color:var(--sky-muted)}
-body[data-sky] .title,body[data-sky] .title.compact{font-size:clamp(30px,3.8vw,48px);line-height:1.24;font-weight:560;letter-spacing:-.04em;min-height:2.48em}
-body[data-sky] .title-line{min-height:1.24em}
-body[data-sky] .poem{font-size:16px;line-height:1.85;margin:22px 0 0;min-height:0;max-width:30em;color:var(--sky-ink)}
-body[data-sky] .personal{font-size:13px;line-height:1.8;margin:18px 0 0;min-height:0}
-body[data-sky] .longing{margin-top:20px}
-body[data-sky] .divider{margin:22px 0 14px;width:28px;background:var(--sky-line);opacity:.7}
-body[data-sky] .code-note{font-family:inherit;font-size:12px;line-height:1.85}
-body[data-sky] .visual-column{gap:0;min-width:0}
-body[data-sky] .scene{height:360px;min-height:0}
-body[data-sky] .artwork{inset:20px 0 24px}
-body[data-sky] .orbit-label{font-size:11px;letter-spacing:.05em;top:0}
-body[data-sky] .scene-hint{font-size:10px;line-height:1.5;bottom:0;opacity:.8}
 /* This small view belongs to the right-hand column; it cannot push past the hero. */
-.bund-view{position:relative;width:100%;height:138px;margin:18px 0 30px;pointer-events:none;isolation:isolate;border-radius:16px;background:linear-gradient(var(--sky-c),var(--sky-b) 65%,var(--sky-surface))}
+.bund-view{background:linear-gradient(var(--sky-c),var(--sky-b) 65%,var(--sky-surface))}
 .sky-atmosphere{position:absolute;inset:0;width:100%;height:100%;border-radius:16px;z-index:0;pointer-events:none}
 .sky-atmosphere[hidden]{display:none}
 .bund-view:before{content:"";position:absolute;inset:auto 0 0;height:55%;border-radius:0 0 16px 16px;background:linear-gradient(transparent,var(--sky-reflection));z-index:1}
 .bund-drawing{position:absolute;z-index:2;inset:auto 3% 0;height:76%;color:var(--sky-building);opacity:.9}
-.bund-view figcaption{position:absolute;left:0;bottom:-21px;color:var(--sky-muted);font:500 8px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:.12em}
 body[data-sky="night"] .bund-drawing{opacity:.8}
 body[data-sky="night"] .bund-view:before{background:linear-gradient(transparent,var(--sky-reflection))}
-body[data-sky] .weather-disclosure{margin:0;width:100%;max-width:100%;align-self:stretch}
-body[data-sky] .weather-summary{padding:8px 0;border-radius:0;gap:4px 10px;border-top:1px solid color-mix(in srgb,var(--sky-line),transparent 60%)}
-body[data-sky] .weather-summary-main{gap:8px}.weather-summary-stats{gap:6px 14px}
 body[data-sky] :is(.brand,.live-time,.weather-summary-stats b,.restaurant-card h3){color:var(--sky-ink)}
 body[data-sky] :is(.date,.personal,.code-note,.scene-hint,.orbit-label,.longing,.longing-note,.weather-disclosure,.weather-summary-stats,.clothing-note,.weather-metrics dd,.food-section,.food-subtitle,.food-status,.food-notice,.restaurant-address,.restaurant-hours,.restaurant-tag,.thought span,.thought b){color:var(--sky-muted)}
-body[data-sky] :is(.title .accent,.personal b,.code-note em,.longing-number,.restaurant-stats,.restaurant-card a,.weather-refresh){color:var(--sky-accent)}
+body[data-sky] :is(.title .accent,.personal b,.code-note em,.longing-number,.restaurant-stats,.restaurant-card a,.weather-refresh){color:var(--action)}
 body[data-sky] .brand i{background:var(--sky-accent);box-shadow:none}
 body[data-sky] :is(.shuffle,.restaurant-card,.place-option,.food-location-form input,.clock-face){background:var(--sky-surface);color:var(--sky-ink);border-color:var(--sky-line)}
 body[data-sky] :is(.weather-summary:hover,.weather-refresh:hover,.place-option:hover,.shuffle:hover){background:var(--sky-surface)}
 body[data-sky] :is(.weather-expanded,.food-section){border-color:color-mix(in srgb,var(--sky-line),transparent 55%)}
-body[data-sky] .food-section{padding:16px 0;margin-top:8px;margin-bottom:20px}
-body[data-sky] .food-title{font-size:16px}
 body[data-sky] .food-location-form input::placeholder{color:var(--sky-muted)}
 body[data-sky] .hand{background:var(--sky-muted)}body[data-sky] .second-hand,body[data-sky] .clock-face:after{background:var(--sky-accent)}
-body[data-sky] :is(button,a,input,summary):focus-visible{outline-color:var(--sky-accent)}
-@media(max-width:960px) and (min-width:761px){body[data-sky] main{gap:28px;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}body[data-sky] .title,body[data-sky] .title.compact{font-size:36px}}
-@media(max-width:760px){body[data-sky] main{grid-template-columns:minmax(0,1fr);gap:24px;padding-top:8px;padding-bottom:18px}body[data-sky] .letter{padding-top:12px}body[data-sky] .title,body[data-sky] .title.compact{font-size:clamp(29px,7.5vw,42px)}body[data-sky] .scene{height:340px}.bund-view{height:150px;margin-top:12px;margin-bottom:30px}body[data-sky] .visual-column{width:100%}body[data-sky] .weather-summary{padding:10px 0}}
+body[data-sky] :is(button,a,input,summary):focus-visible{outline-color:var(--action)}
 @media(prefers-contrast:more){body[data-sky] .personal{color:var(--sky-ink)}}
 
 .bund-drawing svg{display:block;width:100%;height:100%;color:inherit}
