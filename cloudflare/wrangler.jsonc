@@ -1,0 +1,11 @@
+{
+  "name": "blue-white-weather",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-25",
+  "workers_dev": true,
+  "keep_vars": true,
+  "observability": { "enabled": false },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://kaychiao.github.io,http://localhost:8000,http://127.0.0.1:8000"
+  }
+}

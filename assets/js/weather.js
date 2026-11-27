@@ -12,7 +12,7 @@
     setTimeout(tick,1000-now.getMilliseconds());
   }
   tick();
-  const cacheKey='bw-shanghai-weather-v1';let busy=false;
+  const cacheKey='bw-shanghai-weather-v1';let busy=false,lastAttempt=-Infinity,lastGood=null;
   const byId=id=>document.getElementById(id);
   const percent=n=>Number.isFinite(n)?`${Math.round(n)}%`:'—';
   const degrees=n=>Number.isFinite(n)?`${Math.round(n)}°`:'—';
@@ -23,7 +23,7 @@
     if([51,53,55,56,57].includes(code))return '细雨';
     if([61,63,65,66,67,80,81,82].includes(code))return '有雨';return '天气更新中';
   }
-  function render(data,cached=false) {
+  function render(data,cached=false,connection='snapshot') {
     const c=data?.current;if(!c || !Number.isFinite(c.temperature_2m) || !Number.isFinite(c.time) || Date.now()-c.time*1000>24*3600000 || c.time*1000>Date.now()+900000)throw Error('Invalid or expired weather');
     const now=Date.now()/1000, times=data.hourly?.time||[], probs=data.hourly?.precipitation_probability||[];
     const windowValues=times.map((t,i)=>({t,p:probs[i]})).filter(x=>x.t>=Math.floor(now/3600)*3600 && x.t<now+3*3600 && Number.isFinite(x.p));
@@ -39,9 +39,9 @@
     byId('clothing').textContent=delayed?'这份天气观测较早，出门前请查看当地实时预报。':clothes;
     const stamp=new Intl.DateTimeFormat('zh-CN',{timeZone:zone,month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(c.time*1000));
     const stale=Date.now()-c.time*1000>90*60*1000;
-    const freshness=byId('weatherFreshness');freshness.hidden=!stale;freshness.textContent=stale?`${stamp} 观测 · 较早数据`:'';
-    byId('weatherUpdated').textContent=`${cached||stale?'较早数据 · ':''}${stamp} 更新 · 数据说明`;
-    byId('weatherStatus').textContent=`${cached||stale?'较早数据 · ':''}${stamp} 数据 · 定时更新 · 穿衣按体感估算`;
+    const freshness=byId('weatherFreshness');freshness.hidden=!stale&&connection!=='live';freshness.textContent=`${stamp} 观测${stale?' · 较早数据':''}`;
+    byId('weatherUpdated').textContent=`${stamp} 观测 · ${connection==='live'?'接口查询':cached?'本地备用':'发布快照'} · 数据说明`;
+    byId('weatherStatus').textContent=connection==='live'?`已查询和风 · ${stamp} 观测 · 接口最多缓存 5 分钟`:`实时连接暂不可用 · ${stamp} ${cached?'本地备用':'发布快照'}${stale?' · 较早数据':''}`;
     const attribution=byId('weatherAttribution');
     const isQWeather=data.source==='qweather';
     attribution.textContent=isQWeather?'和风天气 ↗':'Open-Meteo ↗';
@@ -50,6 +50,7 @@
     for(const href of data.attributionURLs||[]){
       try{const url=new URL(href);if(url.protocol!=='https:')continue;const a=document.createElement('a');a.href=url.href;a.textContent='数据归因 ↗';a.target='_blank';a.rel='noopener noreferrer';extra.append(a)}catch{}
     }
+    lastGood=data;
     byId('weatherPanel').setAttribute('aria-busy','false');
   }
   function loadSnapshot() {
@@ -62,19 +63,39 @@
       document.head.append(script);
     });
   }
-  async function refresh() {
-    if(busy)return;busy=true;byId('weatherRefresh').disabled=true;
-    try {
-      const data=await loadSnapshot();render(data);
-      try{localStorage.setItem(cacheKey,JSON.stringify({savedAt:Date.now(),data}))}catch{}
-    } catch {
-      let shown=false;
-      try {const saved=JSON.parse(localStorage.getItem(cacheKey));if(saved && Date.now()-saved.savedAt<24*3600*1000){render(saved.data,true);shown=true}}catch{}
-      if(!shown){byId('weatherFreshness').hidden=true;byId('weatherUpdated').textContent='暂未更新 · 数据说明';for(const id of ['temperature','feelsLike','humidity','rainChance','humidityCompact','rainCompact'])byId(id).textContent='—';byId('conditions').textContent='暂时无法获取';byId('clothing').textContent='天气连接暂不可用，出门前看看当地预报。';byId('weatherStatus').textContent='天气尚未发布或数据已过期 · 稍后再试';}
-    } finally {busy=false;byId('weatherRefresh').disabled=false;byId('weatherPanel').setAttribute('aria-busy','false');}
+  async function loadLive(){
+    const endpoint=window.weatherConfig?.endpoint;
+    if(!endpoint)throw Error('Live weather not configured');
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),10000);
+    try{
+      const response=await fetch(endpoint,{signal:controller.signal,credentials:'omit',cache:'no-store',referrerPolicy:'no-referrer'});
+      if(!response.ok)throw Error('Live weather unavailable');
+      const data=await response.json(),c=data?.current;
+      if(!c||!Number.isFinite(c.time)||Date.now()-c.time*1000>3*3600000)throw Error('Live observation expired');
+      return data;
+    }finally{clearTimeout(timeout)}
   }
-  byId('weatherRefresh').addEventListener('click',refresh);
+  function showFallback(extra){
+    const choices=[{data:lastGood},{data:window.shanghaiWeather},{data:extra}];
+    try{const saved=JSON.parse(localStorage.getItem(cacheKey));if(saved&&Date.now()-saved.savedAt<24*3600000)choices.push({data:saved.data,cached:true})}catch{}
+    choices.sort((a,b)=>(b.data?.current?.time||0)-(a.data?.current?.time||0));
+    for(const choice of choices){try{render(choice.data,!!choice.cached);return true}catch{}}
+    return false;
+  }
+  async function refresh(force=false){
+    if(busy||(!force&&Date.now()-lastAttempt<60000))return;
+    busy=true;lastAttempt=Date.now();byId('weatherRefresh').disabled=true;byId('weatherPanel').setAttribute('aria-busy','true');
+    try{
+      const data=await loadLive();render(data,false,'live');
+      try{localStorage.setItem(cacheKey,JSON.stringify({savedAt:Date.now(),data}))}catch{}
+    }catch{
+      let shown=showFallback();
+      if(!shown){try{shown=showFallback(await loadSnapshot())}catch{}}
+      if(!shown){byId('weatherFreshness').hidden=true;byId('weatherUpdated').textContent='暂未更新 · 数据说明';for(const id of ['temperature','feelsLike','humidity','rainChance','humidityCompact','rainCompact'])byId(id).textContent='—';byId('conditions').textContent='暂时无法获取';byId('clothing').textContent='天气连接暂不可用，出门前看看当地预报。';byId('weatherStatus').textContent='实时连接失败，且没有有效备用观测 · 稍后再试';}
+    }finally{busy=false;byId('weatherRefresh').disabled=false;byId('weatherPanel').setAttribute('aria-busy','false')}
+  }
+  byId('weatherRefresh').addEventListener('click',()=>refresh(true));
   try{render(window.shanghaiWeather)}catch{}
-  refresh();setInterval(()=>{if(!document.hidden)refresh()},15*60*1000);
+  refresh();setInterval(()=>{if(!document.hidden)refresh()},5*60*1000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
 })();

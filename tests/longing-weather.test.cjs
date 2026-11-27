@@ -29,3 +29,16 @@ test('Returning after fifteen seconds adds a reunion note; brief switches do not
  p.advance(25000);assert.doesNotMatch(p.el('longingNote').textContent,/你一回来/);
  p.document.hidden=true;p.events.visibilitychange();p.advance(1000);p.document.hidden=false;p.events.visibilitychange();assert.doesNotMatch(p.el('longingNote').textContent,/你一回来/);
 });
+
+test('Live weather runs on opening, throttles quick tab returns, refreshes manually and retains newest data on failure',async()=>{
+ const p=page('weather.js');let calls=0,failed=false;
+ p.c.AbortController=AbortController;p.c.window.weatherConfig={endpoint:'https://weather.example/weather'};
+ p.c.window.shanghaiWeather=snapshot(p.now,4*3600000);
+ p.c.fetch=async (url,options)=>{calls++;assert.equal(url,'https://weather.example/weather');assert.equal(options.credentials,'omit');if(failed)throw Error('offline');const data=snapshot(p.now,5*60000);data.current.temperature_2m=18;return{ok:true,json:async()=>data}};
+ p.run();const settle=()=>new Promise(resolve=>setImmediate(resolve));await settle();
+ assert.equal(calls,1);assert.equal(p.el('temperature').textContent,'18°');assert.match(p.el('weatherStatus').textContent,/已查询和风/);
+ p.events.visibilitychange();await settle();assert.equal(calls,1);
+ p.advance(61000);p.events.visibilitychange();await settle();assert.equal(calls,2);
+ await p.el('weatherRefresh').handlers.click();assert.equal(calls,3);
+ failed=true;await p.el('weatherRefresh').handlers.click();assert.equal(calls,4);assert.equal(p.el('temperature').textContent,'18°');assert.match(p.el('weatherStatus').textContent,/实时连接暂不可用/);
+});

@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: '22'
       - name: Verify copy timing and content rules
-        run: node --test tests/*.test.*
+        run: node --test tests/*.test.* cloudflare/worker.test.mjs
       - name: Restore last valid AI batch
         uses: actions/cache/restore@v4
         with:

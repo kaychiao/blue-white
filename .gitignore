@@ -4,3 +4,8 @@
 _site/
 content/profile.json
 content/recent.json
+
+# Local Cloudflare credentials and generated tooling files
+.dev.vars
+.dev.vars.*
+.wrangler/
